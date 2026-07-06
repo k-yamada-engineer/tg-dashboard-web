@@ -302,7 +302,7 @@ async function openDetail(id){
   try{
     const [c]=await api(`customers?id=eq.${id}&select=*`);
     const msgs=await api(`messages?customer_id=eq.${id}&select=direction,mtype,body,sent_at,line_message_id&order=sent_at.asc&limit=300`);
-    const media=await api(`media?customer_id=eq.${id}&select=filename,drive_url,status,line_message_id&order=created_at.desc`);
+    const media=await api(`media?customer_id=eq.${id}&select=filename,drive_url,status,bytes,line_message_id&order=created_at.desc`);
     const hist=await api(`mark_history?customer_id=eq.${id}&select=from_mark,to_mark,changed_at&order=changed_at.desc&limit=30`);
     renderDetail(c,msgs,media,hist);
   }catch(e){$('detail-body').innerHTML=`<div class="empty">読み込みエラー: ${esc(e.message)}</div>`;}
@@ -317,15 +317,23 @@ function renderDetail(c,msgs,media,hist){
     const side=m.direction==='outbound'?'out':'in';
     let inner;
     if(m.mtype==='image'){
-      const mm=imgByLmid[m.line_message_id], link=mm&&mm.drive_url;
-      inner=link?`<a class="imgph" href="${esc(link)}" target="_blank" rel="noopener"><span class="ib">🖼</span>受信画像を開く（Drive保存済）</a>`
-                :`<span class="imgph"><span class="ib">🖼</span>受信画像（保存待ち）</span>`;
+      const mm=imgByLmid[m.line_message_id], st=mm&&mm.status;
+      let lab='受信画像（保存待ち）';
+      if(mm&&mm.drive_url)lab='受信画像を開く（Drive保存済）';
+      else if(st==='saved')lab='受信画像（Drive保存済）';
+      else if(st==='expired')lab='受信画像（LINE保存期限切れ・取得不可）';
+      inner=(mm&&mm.drive_url)?`<a class="imgph" href="${esc(mm.drive_url)}" target="_blank" rel="noopener"><span class="ib">🖼</span>${lab}</a>`
+                :`<span class="imgph" style="${st==='expired'?'opacity:.6':''}"><span class="ib">🖼</span>${lab}</span>`;
     }else{inner=esc(m.body||'（'+m.mtype+'）');}
     talk+=`<div class="msg ${side}">${inner}<div class="mt">${time}</div></div>`;
   });
   const saved=media.filter(m=>m.status==='saved');
-  const docs=saved.length?saved.map(m=>`<a class="doccell" href="${esc(m.drive_url)}" target="_blank" rel="noopener"><div class="dp">🖼</div><b>${esc(m.filename||'画像')}</b><span>Drive保存済</span></a>`).join('')
-    :`<div class="empty">保存済み画像なし（受信画像 ${media.length}件が保存待ち。毎時同期で順次Driveへ）</div>`;
+  const expired=media.filter(m=>m.status==='expired').length;
+  const cell=m=>{const inner=`<div class="dp">🖼</div><b>${esc(m.filename||'画像')}</b><span>${m.drive_url?'Drive・開く':'Drive保存済'}</span>`;
+    return m.drive_url?`<a class="doccell" href="${esc(m.drive_url)}" target="_blank" rel="noopener">${inner}</a>`:`<div class="doccell" style="cursor:default">${inner}</div>`;};
+  const docs=saved.length?saved.map(cell).join('')
+    :`<div class="empty">保存済み画像なし${expired?`（${expired}件はLINE保存期限切れで取得不可）`:''}</div>`;
+  const expNote=expired&&saved.length?`<div class="note" style="margin-top:12px">うち ${expired}件 はLINE側の保存期限切れで取得できませんでした（過去分のみ）。今後の受信画像は毎時取得で自動保存されます。</div>`:'';
   const histRows=hist.length?hist.map(h=>`<div class="mrow"><span class="sub2" style="width:96px">${new Date(h.changed_at).toLocaleString('ja-JP',{month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'})}</span><span>${esc(h.from_mark||'—')} → <b>${esc(h.to_mark||'—')}</b></span></div>`).join(''):'<div class="empty">変更履歴なし（次回同期以降のマーク変更が記録されます）</div>';
   $('detail-body').innerHTML=`
     <div class="d-head"><div class="d-av">${esc(nm[0])}</div>
@@ -344,7 +352,7 @@ function renderDetail(c,msgs,media,hist){
           <button data-t="log">変更履歴</button>
         </div>
         <div class="rpane on" id="rp-talk"><div class="talk">${talk||'<div class="empty">トークなし</div>'}</div></div>
-        <div class="rpane" id="rp-docs"><div class="docgrid">${docs}</div></div>
+        <div class="rpane" id="rp-docs"><div class="docgrid">${docs}</div>${expNote}</div>
         <div class="rpane" id="rp-log">${histRows}</div>
       </div>
     </div>`;

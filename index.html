@@ -1,0 +1,386 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>徳永高法律事務所 基幹システム</title>
+<style>
+  :root{
+    --text:#33475B;--muted:#516F90;--muted2:#7C98B6;--bg:#F5F8FA;--card:#FFFFFF;--border:#CBD6E2;--line:#EAF0F6;
+    --rail:#2E3F50;--rail-hov:#26364A;--rail-on:#1D2C3D;--rail-txt:#AFBFD1;
+    --orange:#FF7A59;--orange-d:#E66E50;--orange-soft:#FFF1EE;--link:#0091AE;--link-soft:#E5F5F8;
+    --navy:#33475B;--navy-soft:#EAF0F6;--good:#00A88F;--good-soft:#E5F8F5;--warn:#DFA100;--warn-soft:#FDF5DE;
+    --crit:#F2545B;--crit-soft:#FDEDEE;--purple:#6A78D1;--purple-soft:#EEF0FA;--grey:#7C98B6;--grey-soft:#F0F4F8;
+    --shadow:0 1px 3px rgba(45,62,80,.08);--font:-apple-system,BlinkMacSystemFont,"Hiragino Kaku Gothic ProN","Hiragino Sans","Yu Gothic",YuGothic,"Noto Sans JP",Meiryo,sans-serif;
+  }
+  *{box-sizing:border-box}html,body{margin:0;padding:0}
+  body{font-family:var(--font);background:var(--bg);color:var(--text);font-size:13px;line-height:1.55;-webkit-font-smoothing:antialiased}
+  h1,h2,h3{margin:0}button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit;font-size:inherit}
+  .tnum,td.num,th.num,.k-val{font-variant-numeric:tabular-nums}
+  #login{position:fixed;inset:0;display:grid;place-items:center;background:linear-gradient(135deg,#2E3F50,#1D2C3D);z-index:100}
+  .lbox{background:#fff;border-radius:10px;padding:32px 30px;width:340px;box-shadow:0 10px 40px rgba(0,0,0,.3)}
+  .lbox .crest{width:44px;height:44px;border-radius:9px;background:#FF7A59;color:#fff;display:grid;place-items:center;font-weight:800;font-size:20px;margin:0 auto 14px}
+  .lbox h1{font-size:16px;text-align:center;color:var(--navy);margin-bottom:4px}
+  .lbox p{text-align:center;color:var(--muted);font-size:11.5px;margin:0 0 20px}
+  .lbox label{font-size:11px;font-weight:700;color:var(--muted);display:block;margin:12px 0 5px}
+  .lbox input{width:100%;border:1px solid var(--border);border-radius:6px;padding:10px 12px;font-size:14px;font-family:inherit}
+  .lbox input:focus{outline:2px solid var(--link-soft);border-color:var(--link)}
+  .lbox button{width:100%;background:var(--orange);color:#fff;font-weight:700;border-radius:6px;padding:11px;margin-top:20px;font-size:14px}
+  .lbox button:hover{background:var(--orange-d)}
+  .lerr{color:var(--crit);font-size:11.5px;text-align:center;margin-top:12px;min-height:16px}
+  .app{display:none;grid-template-columns:216px 1fr;min-height:100vh}.app.on{display:grid}
+  .rail{background:var(--rail);display:flex;flex-direction:column;position:sticky;top:0;height:100vh}
+  .brand{padding:17px 16px 15px;display:flex;gap:10px;align-items:center;border-bottom:1px solid rgba(255,255,255,.08)}
+  .brand .crest{width:31px;height:31px;border-radius:6px;background:#FF7A59;display:grid;place-items:center;color:#fff;font-weight:800;font-size:14px;flex:none}
+  .brand b{color:#fff;font-size:13px;font-weight:700;line-height:1.3;display:block}.brand span{color:#8FA5BC;font-size:10px;font-weight:600;letter-spacing:.1em}
+  .nav{padding:6px 8px 12px;flex:1;overflow:auto}
+  .nlabel{font-size:9.5px;color:#6C84A0;letter-spacing:.14em;font-weight:700;padding:14px 10px 4px}
+  .nav a{display:flex;align-items:center;gap:9px;padding:7.5px 10px;border-radius:4px;color:var(--rail-txt);text-decoration:none;font-size:12.5px;font-weight:500;cursor:pointer}
+  .nav a .ic{width:16px;text-align:center;font-size:13px;opacity:.9}
+  .nav a:hover{background:var(--rail-hov);color:#E4ECF3}.nav a.on{background:var(--rail-on);color:#fff;font-weight:600}
+  .nav a .cnt{margin-left:auto;font-size:10px;background:rgba(255,255,255,.12);color:#C7D5E2;border-radius:9px;padding:1px 7px;font-weight:700}
+  .railfoot{padding:12px 15px;border-top:1px solid rgba(255,255,255,.08);font-size:10.5px;color:#7C93AB;display:flex;align-items:center;gap:7px;justify-content:space-between}
+  .railfoot button{color:#9FB3C6;font-size:11px}.railfoot button:hover{color:#fff}
+  .dot{width:6px;height:6px;border-radius:50%;background:var(--good);flex:none}
+  .main{display:flex;flex-direction:column;min-width:0}
+  .top{background:var(--card);border-bottom:1px solid var(--border);padding:0 24px;height:56px;display:flex;align-items:center;gap:14px;position:sticky;top:0;z-index:30}
+  .top h1{font-size:15px;font-weight:700;color:var(--navy)}.top .sub{color:var(--muted);font-size:11px}
+  .spacer{flex:1}
+  .pill-live{font-size:10.5px;color:var(--good);background:var(--good-soft);border-radius:12px;padding:4px 10px;font-weight:700;display:inline-flex;gap:6px;align-items:center}
+  .av{width:28px;height:28px;border-radius:50%;background:var(--navy);color:#fff;display:grid;place-items:center;font-weight:700;font-size:11px}
+  .wrap{padding:20px 24px 60px;max-width:1280px;width:100%;margin:0 auto}
+  .view{display:none}.view.on{display:block}
+  .sectitle{font-size:13.5px;font-weight:700;color:var(--navy)}.secsub{color:var(--muted);font-size:11px;margin-top:1px}
+  .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px}
+  .kpi{background:var(--card);border:1px solid var(--border);border-radius:6px;padding:13px 15px 12px;box-shadow:var(--shadow)}
+  .k-lab{font-size:11px;color:var(--muted);font-weight:600}
+  .k-val{font-size:24px;font-weight:800;margin-top:6px;line-height:1.1;color:var(--navy)}
+  .k-sub{font-size:10.5px;color:var(--muted);margin-top:4px}
+  .grid2{display:grid;grid-template-columns:1.4fr 1fr;gap:14px;margin-bottom:14px}
+  .panel{background:var(--card);border:1px solid var(--border);border-radius:6px;box-shadow:var(--shadow);margin-bottom:14px}
+  .phead{padding:13px 17px 11px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+  .pbody{padding:14px 17px}
+  .fn{display:flex;flex-direction:column;gap:8px}
+  .fnrow{display:grid;grid-template-columns:110px 1fr 110px;align-items:center;gap:12px}
+  .fnrow .fl{font-size:12px;font-weight:600}
+  .fnbar{height:26px;border-radius:3px;display:flex;align-items:center;min-width:34px}
+  .fnbar span{color:#fff;font-weight:700;font-size:11.5px;padding-left:9px;white-space:nowrap}
+  .fnrow .fr{font-size:11px;color:var(--muted);text-align:right}.fnrow .fr b{color:var(--navy)}
+  .mgrp{font-size:10px;font-weight:700;letter-spacing:.07em;color:var(--muted2);margin:11px 0 4px;display:flex;gap:8px;align-items:center}
+  .mgrp:first-child{margin-top:0}.mgrp .gl{flex:1;height:1px;background:var(--line)}
+  .mrow{display:flex;align-items:center;gap:9px;padding:4px 7px;border-radius:4px}.mrow:hover{background:var(--bg)}
+  .chip{width:8px;height:8px;border-radius:2px;flex:none}.mname{font-size:12px;flex:1}
+  .mcount{font-size:12.5px;font-weight:700;min-width:34px;text-align:right}
+  .mbar{width:70px;height:4px;border-radius:2px;background:var(--grey-soft);overflow:hidden;flex:none}.mbar i{display:block;height:100%;border-radius:2px}
+  .tablewrap{overflow-x:auto}
+  table{border-collapse:separate;border-spacing:0;width:100%;font-size:12px;white-space:nowrap}
+  thead th{text-align:left;font-size:10px;font-weight:700;color:var(--muted);padding:9px 12px;border-bottom:1px solid var(--border);background:var(--bg)}
+  tbody td{padding:9px 12px;border-bottom:1px solid var(--line)}tbody tr:last-child td{border-bottom:none}
+  tbody tr.click{cursor:pointer}tbody tr.click:hover td{background:#F7FAFC}
+  td.num,th.num{text-align:right}.nm{font-weight:600}.sub2{color:var(--muted);font-size:11px}
+  .b-mark{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:600;padding:3px 10px 3px 8px;border-radius:11px;background:var(--grey-soft);white-space:nowrap}
+  .b-mark .chip{width:7px;height:7px}
+  .badge{display:inline-flex;align-items:center;gap:5px;font-size:10.5px;font-weight:700;padding:3px 9px;border-radius:11px;white-space:nowrap}
+  .fchip{font-size:11.5px;font-weight:600;padding:5px 12px;border-radius:14px;border:1px solid var(--border);background:var(--card);color:var(--muted)}
+  .fchip:hover{border-color:var(--link);color:var(--link)}.fchip.on{background:var(--navy);color:#fff;border-color:var(--navy)}
+  .filters{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
+  .searchbar{display:flex;gap:10px;margin-bottom:12px}
+  .searchbar input{flex:1;border:1px solid var(--border);border-radius:4px;padding:9px 12px;font-size:13px;background:var(--card);font-family:inherit}
+  .searchbar input:focus{outline:2px solid var(--link-soft);border-color:var(--link)}
+  .pager{display:flex;gap:8px;align-items:center;justify-content:flex-end;padding:12px 4px 0;font-size:12px;color:var(--muted)}
+  .pager button{border:1px solid var(--border);border-radius:5px;padding:5px 11px;font-weight:600}
+  .pager button:disabled{opacity:.4;cursor:default}
+  .d-grid{display:grid;grid-template-columns:300px 1fr;gap:14px;align-items:start}
+  .d-head{background:var(--card);border:1px solid var(--border);border-radius:6px;box-shadow:var(--shadow);padding:16px 20px;margin-bottom:14px;display:flex;align-items:center;gap:15px;flex-wrap:wrap}
+  .d-av{width:50px;height:50px;border-radius:50%;background:var(--navy);color:#fff;display:grid;place-items:center;font-size:20px;font-weight:700;flex:none}
+  .d-head h2{font-size:18px;color:var(--navy)}
+  .kv .r{display:flex;justify-content:space-between;gap:12px;padding:7px 0;border-bottom:1px solid var(--line);font-size:12px}
+  .kv .r:last-child{border-bottom:none}.kv .kk{color:var(--muted)}.kv .vv{font-weight:600;text-align:right}
+  .memo{background:#FBFAF4;border:1px solid #EFE6CD;border-radius:8px;padding:12px 13px;font-size:12px;line-height:1.7;color:#3B3627;white-space:pre-wrap;max-height:320px;overflow:auto}
+  .rtabs{display:flex;gap:2px;border-bottom:1px solid var(--border);padding:0 17px}
+  .rtabs button{padding:11px 15px 9px;font-size:12.5px;font-weight:600;color:var(--muted);border-bottom:2.5px solid transparent;margin-bottom:-1px}
+  .rtabs button.on{color:var(--navy);border-bottom-color:var(--orange);font-weight:700}
+  .rpane{display:none;padding:15px 17px}.rpane.on{display:block}
+  .talk{display:flex;flex-direction:column;gap:9px;max-height:520px;overflow:auto;padding-right:4px}
+  .msg{max-width:82%;padding:9px 12px;border-radius:10px;font-size:12px;line-height:1.55}
+  .msg.in{background:var(--grey-soft);border-bottom-left-radius:2px;align-self:flex-start}
+  .msg.out{background:var(--link-soft);border-bottom-right-radius:2px;align-self:flex-end}
+  .msg.sys{background:transparent;color:var(--muted2);font-size:10.5px;align-self:center;text-align:center;max-width:100%}
+  .msg .mt{font-size:9.5px;color:var(--muted2);margin-top:4px}
+  .msg .imgph{display:flex;align-items:center;gap:8px;background:#fff;border:1px solid var(--border);border-radius:6px;padding:8px 10px;font-size:11px;color:var(--link);text-decoration:none}
+  .msg .imgph .ib{width:28px;height:28px;border-radius:4px;background:var(--navy-soft);display:grid;place-items:center;font-size:13px}
+  .docgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+  .doccell{border:1px solid var(--border);border-radius:6px;padding:10px;font-size:10.5px;color:var(--muted);text-align:center;text-decoration:none;display:block}
+  .doccell:hover{border-color:var(--link);background:var(--link-soft)}
+  .doccell .dp{height:48px;border-radius:4px;display:grid;place-items:center;font-size:20px;margin-bottom:6px;background:var(--orange-soft);color:var(--orange-d)}
+  .doccell b{display:block;font-size:11px;color:var(--navy);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .note{font-size:11.5px;color:var(--muted);background:var(--link-soft);border-radius:6px;padding:12px 14px;line-height:1.6}
+  .empty{padding:40px;text-align:center;color:var(--muted2);font-size:12px}
+  .spin{width:22px;height:22px;border:2.5px solid var(--line);border-top-color:var(--orange);border-radius:50%;animation:sp .7s linear infinite;margin:40px auto}
+  @keyframes sp{to{transform:rotate(360deg)}}
+</style>
+</head>
+<body>
+
+<div id="login">
+  <div class="lbox">
+    <div class="crest">徳</div>
+    <h1>徳永高法律事務所 基幹システム</h1>
+    <p>返金請求オペレーション</p>
+    <form id="lform">
+      <label>メールアドレス</label>
+      <input id="lemail" type="email" autocomplete="username" value="knt.yd.36@gmail.com">
+      <label>パスワード</label>
+      <input id="lpass" type="password" autocomplete="current-password" placeholder="パスワード">
+      <button type="submit" id="lbtn">ログイン</button>
+      <div class="lerr" id="lerr"></div>
+    </form>
+  </div>
+</div>
+
+<div class="app" id="app">
+  <aside class="rail">
+    <div class="brand"><div class="crest">徳</div><div><b>徳永高法律事務所</b><span>返金請求 OPS</span></div></div>
+    <nav class="nav" id="nav">
+      <div class="nlabel">概況</div>
+      <a data-v="home" class="on"><span class="ic">◧</span>ダッシュボード</a>
+      <div class="nlabel">案件</div>
+      <a data-v="list"><span class="ic">☰</span>顧客リスト<span class="cnt" id="nav-total">…</span></a>
+      <a data-v="detail" id="nav-detail" style="display:none"><span class="ic">◔</span>顧客詳細</a>
+      <a data-v="lost"><span class="ic">◑</span>失注・無効分析</a>
+      <div class="nlabel">分析（広告データ接続後）</div>
+      <a data-v="soon"><span class="ic">▤</span>ファネル・ROI・予実</a>
+    </nav>
+    <div class="railfoot"><span><span class="dot"></span> <span id="foot-sync">同期確認中</span></span><button id="logout">ログアウト</button></div>
+  </aside>
+  <div class="main">
+    <header class="top">
+      <div><h1 id="t-title">ダッシュボード</h1><div class="sub" id="t-sub">実データ・全体サマリー</div></div>
+      <div class="spacer"></div>
+      <span class="pill-live"><span class="dot" style="width:5px;height:5px"></span>本番データ</span>
+      <span class="av" id="me-av">К</span>
+    </header>
+    <div class="wrap">
+      <section class="view on" id="v-home"><div id="home-body"><div class="spin"></div></div></section>
+      <section class="view" id="v-list">
+        <div class="searchbar"><input id="q" placeholder="名前で検索…"></div>
+        <div class="filters" id="listfilters"></div>
+        <div class="panel"><div class="tablewrap"><table id="ltable"></table></div><div class="pager" id="pager"></div></div>
+      </section>
+      <section class="view" id="v-detail"><div id="detail-body"><div class="empty">顧客リストから選択してください</div></div></section>
+      <section class="view" id="v-lost"><div id="lost-body"><div class="spin"></div></div></section>
+      <section class="view" id="v-soon">
+        <div class="panel"><div class="pbody"><div class="note"><b>ファネル分析・KWクロス・広告ROI・予実管理</b>は、広告費スプレッドシートと友だち情報欄（被害額・送金方法・utm）の接続後に実数化されます。設計・画面はモック（v4）で確定済み。この画面は実データ接続待ちです。</div></div></div>
+      </section>
+    </div>
+  </div>
+</div>
+
+<script>
+const CFG={url:'https://ipasmyytsjyznsxziqdw.supabase.co',key:'sb_publishable_KVexnNE9bhhMXcOvFOGgxg_vxzOhUmF'};
+const $=id=>document.getElementById(id);
+const C={navy:'#33475B',orange:'#FF7A59',good:'#00A88F',warn:'#DFA100',crit:'#F2545B',link:'#0091AE',purple:'#6A78D1',grey:'#7C98B6'};
+let TOKEN=null, ME=null;
+const esc=s=>(s==null?'':String(s)).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+async function api(path){
+  const r=await fetch(CFG.url+'/rest/v1/'+path,{headers:{apikey:CFG.key,Authorization:'Bearer '+TOKEN}});
+  if(!r.ok)throw new Error('API '+r.status);
+  return r.json();
+}
+async function count(path){
+  const r=await fetch(CFG.url+'/rest/v1/'+path,{headers:{apikey:CFG.key,Authorization:'Bearer '+TOKEN,Prefer:'count=exact',Range:'0-0'}});
+  return +((r.headers.get('content-range')||'/0').split('/')[1])||0;
+}
+
+const MARK_GROUPS=[
+ {g:'アクティブ・追客',key:'active',c:'navy',marks:['未反応','要・電話日程調整','電話日程切り済み','不通','対応中（迫田）','対応中（下沢）','回答後レス無し','要対応（クレーム）']},
+ {g:'クロージング・入金',key:'closing',c:'good',marks:['入金待ち','契約者（入金済み）','見積もり提出後検討中','契約書締結済み','初回入金済み','一次調査終了','二次調査見積もり提出済み','二次追加調査入金完了','残り申請のみ','返金']},
+ {g:'送客（別収益）',key:'soukyaku',c:'purple',marks:['送客']},
+ {g:'無効リード（自動判定）',key:'invalid',c:'grey',marks:['無効リード（案件外）','無効リード（低被害）','無効リード（被害前）','無効リード（凍結済み）','無効リード（依頼しない）']},
+ {g:'失注',key:'lost',c:'crit',marks:['失注（資金なし）','失注（理由なし）','失注（アイミツ負け）','失注（返信なし）']},
+];
+const markColor=m=>{for(const g of MARK_GROUPS)if(g.marks.includes(m))return C[g.c];return C.grey;};
+
+$('lform').addEventListener('submit',async e=>{
+  e.preventDefault(); $('lerr').textContent=''; $('lbtn').textContent='認証中…';
+  try{
+    const r=await fetch(CFG.url+'/auth/v1/token?grant_type=password',{method:'POST',
+      headers:{apikey:CFG.key,'Content-Type':'application/json'},
+      body:JSON.stringify({email:$('lemail').value.trim(),password:$('lpass').value})});
+    const d=await r.json();
+    if(!r.ok||!d.access_token){$('lerr').textContent=d.error_description||d.msg||'ログインに失敗しました';$('lbtn').textContent='ログイン';return;}
+    TOKEN=d.access_token; ME=d.user; localStorage.setItem('tg_token',TOKEN); startApp();
+  }catch(err){$('lerr').textContent='通信エラー: '+err.message;$('lbtn').textContent='ログイン';}
+});
+$('logout').onclick=()=>{localStorage.removeItem('tg_token');location.reload();};
+
+function startApp(){
+  $('login').style.display='none'; $('app').classList.add('on');
+  const nm=(ME&&ME.user_metadata&&ME.user_metadata.name)||'me';
+  $('me-av').textContent=nm[0].toUpperCase();
+  loadHome(); loadListMeta(); loadFooter();
+}
+async function loadFooter(){
+  try{const s=await api('sync_state?key=eq.last_sync&select=value');
+    if(s[0]){const d=new Date(s[0].value);$('foot-sync').textContent='同期 '+d.toLocaleString('ja-JP',{month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'});}
+  }catch(e){$('foot-sync').textContent='同期未取得';}
+}
+
+let MARK_COUNTS=null;
+async function loadHome(){
+  try{
+    const rows=await api('customers?select=taiou_mark,mark_group&limit=5000');
+    const total=rows.length, byMark={}, byGroup={};
+    rows.forEach(r=>{const m=r.taiou_mark||'（マーク無し）';byMark[m]=(byMark[m]||0)+1;byGroup[r.mark_group]=(byGroup[r.mark_group]||0)+1;});
+    MARK_COUNTS=byMark; $('nav-total').textContent=total;
+    const keiyaku=byMark['契約者（入金済み）']||0;
+    const active=byGroup.active||0, closing=byGroup.closing||0, souk=byGroup.soukyaku||0;
+    const kpi=(l,v,s,c)=>`<div class="kpi"><div class="k-lab">${l}</div><div class="k-val" style="color:${c}">${v}</div><div class="k-sub">${s}</div></div>`;
+    let html=`<div class="kpis">
+      ${kpi('総友だち（流入）',total.toLocaleString(),'Lステップ同期',C.navy)}
+      ${kpi('契約者（受任）',keiyaku,'入金済み',C.good)}
+      ${kpi('アクティブ・追客',active+closing,'対応中の案件',C.link)}
+      ${kpi('送客（別収益）',souk,'暗号資産→調査会社',C.purple)}
+    </div>`;
+    const fn=[['総流入',total,C.navy],['対応対象（アクティブ+クロージング+送客）',active+closing+souk,C.link],['クロージング層',closing,C.good],['契約者',keiyaku,C.good]];
+    const fmax=fn[0][1]||1;
+    html+=`<div class="grid2"><div class="panel"><div class="phead"><div><div class="sectitle">ファネル（実データ）</div><div class="secsub">流入 → 対応対象 → クロージング → 受任</div></div></div><div class="pbody"><div class="fn">`;
+    fn.forEach((f,i)=>{html+=`<div class="fnrow"><div class="fl">${f[0]}</div><div class="fnbar" style="width:${Math.max(f[1]/fmax*100,7)}%;background:${f[2]}"><span>${f[1].toLocaleString()}</span></div><div class="fr">${i?'<b>'+(f[1]/fn[i-1][1]*100).toFixed(1)+'%</b>':'―'}</div></div>`;});
+    html+=`</div></div></div>`;
+    html+=`<div class="panel"><div class="phead"><div><div class="sectitle">対応マーク別分布</div><div class="secsub">Lステップ対応マーク＝フェーズ</div></div><span class="badge" style="background:var(--grey-soft);color:var(--muted)">全 ${total}</span></div><div class="pbody" style="max-height:430px;overflow:auto">`;
+    const mx=Math.max(...Object.values(byMark));
+    MARK_GROUPS.forEach(g=>{
+      const items=g.marks.map(m=>[m,byMark[m]||0]).filter(x=>x[1]>0).sort((a,b)=>b[1]-a[1]);
+      if(!items.length)return;
+      html+=`<div class="mgrp">${g.g}<span class="gl"></span></div>`;
+      items.forEach(([m,n])=>{html+=`<div class="mrow"><span class="chip" style="background:${C[g.c]}"></span><span class="mname">${esc(m)}</span><span class="mbar"><i style="width:${n/mx*100}%;background:${C[g.c]}"></i></span><span class="mcount">${n}</span></div>`;});
+    });
+    html+=`</div></div></div>`;
+    $('home-body').innerHTML=html;
+  }catch(e){$('home-body').innerHTML=`<div class="empty">読み込みエラー: ${esc(e.message)}</div>`;}
+}
+
+let listFilter='all', listPage=0, listQ='';
+const PAGE=40;
+function loadListMeta(){
+  const groups=[['all','すべて'],['active','アクティブ・追客'],['closing','クロージング・入金'],['soukyaku','送客'],['invalid','無効リード'],['lost','失注']];
+  $('listfilters').innerHTML=groups.map((g,i)=>`<button class="fchip ${i===0?'on':''}" data-f="${g[0]}">${g[1]}</button>`).join('');
+  document.querySelectorAll('#listfilters .fchip').forEach(b=>b.onclick=()=>{
+    document.querySelectorAll('#listfilters .fchip').forEach(x=>x.classList.remove('on'));b.classList.add('on');
+    listFilter=b.dataset.f;listPage=0;loadList();});
+  let qt;$('q').addEventListener('input',e=>{clearTimeout(qt);qt=setTimeout(()=>{listQ=e.target.value.trim();listPage=0;loadList();},300);});
+}
+async function loadList(){
+  $('ltable').innerHTML='<tbody><tr><td><div class="spin"></div></td></tr></tbody>';
+  let base='customers?select=id,name,taiou_mark,mark_group,memo,added_at&order=added_at.desc';
+  if(listFilter!=='all')base+='&mark_group=eq.'+listFilter;
+  if(listQ)base+='&name=ilike.*'+encodeURIComponent(listQ)+'*';
+  const cnt=await count(base);
+  const rows=await api(base+`&limit=${PAGE}&offset=${listPage*PAGE}`);
+  let html='<thead><tr><th>顧客</th><th>対応マーク（フェーズ）</th><th>メモ抜粋</th><th>流入日</th></tr></thead><tbody>';
+  if(!rows.length)html+='<tr><td colspan="4"><div class="empty">該当なし</div></td></tr>';
+  rows.forEach(r=>{
+    const memo=(r.memo||'').replace(/\s+/g,' ').slice(0,44);
+    const d=r.added_at?new Date(r.added_at).toLocaleDateString('ja-JP',{month:'numeric',day:'numeric'}):'';
+    html+=`<tr class="click" data-id="${r.id}"><td class="nm" style="color:var(--link)">${esc(r.name||'（名前未登録）')}</td>
+      <td><span class="b-mark"><span class="chip" style="background:${markColor(r.taiou_mark)}"></span>${esc(r.taiou_mark||'—')}</span></td>
+      <td class="sub2">${esc(memo)}</td><td class="sub2">${d}</td></tr>`;
+  });
+  html+='</tbody>';$('ltable').innerHTML=html;
+  document.querySelectorAll('#ltable tr.click').forEach(tr=>tr.onclick=()=>openDetail(tr.dataset.id));
+  const pages=Math.max(1,Math.ceil(cnt/PAGE));
+  $('pager').innerHTML=`<span>${cnt.toLocaleString()}件中 ${cnt?listPage*PAGE+1:0}–${Math.min((listPage+1)*PAGE,cnt)}</span>
+    <button ${listPage===0?'disabled':''} id="pprev">‹ 前</button><button ${listPage>=pages-1?'disabled':''} id="pnext">次 ›</button>`;
+  if($('pprev'))$('pprev').onclick=()=>{if(listPage>0){listPage--;loadList();}};
+  if($('pnext'))$('pnext').onclick=()=>{if(listPage<pages-1){listPage++;loadList();}};
+}
+
+async function openDetail(id){
+  go('detail'); $('nav-detail').style.display='';
+  $('detail-body').innerHTML='<div class="spin"></div>';
+  try{
+    const [c]=await api(`customers?id=eq.${id}&select=*`);
+    const msgs=await api(`messages?customer_id=eq.${id}&select=direction,mtype,body,sent_at,line_message_id&order=sent_at.asc&limit=300`);
+    const media=await api(`media?customer_id=eq.${id}&select=filename,drive_url,status,line_message_id&order=created_at.desc`);
+    const hist=await api(`mark_history?customer_id=eq.${id}&select=from_mark,to_mark,changed_at&order=changed_at.desc&limit=30`);
+    renderDetail(c,msgs,media,hist);
+  }catch(e){$('detail-body').innerHTML=`<div class="empty">読み込みエラー: ${esc(e.message)}</div>`;}
+}
+function renderDetail(c,msgs,media,hist){
+  const nm=c.name||'（名前未登録）';
+  const imgByLmid={}; media.forEach(m=>imgByLmid[m.line_message_id]=m);
+  let talk='';
+  msgs.forEach(m=>{
+    const time=new Date(m.sent_at).toLocaleString('ja-JP',{month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'});
+    if(m.mtype==='template'){talk+=`<div class="msg sys">【カルーセル/テンプレ送信】 ${time}</div>`;return;}
+    const side=m.direction==='outbound'?'out':'in';
+    let inner;
+    if(m.mtype==='image'){
+      const mm=imgByLmid[m.line_message_id], link=mm&&mm.drive_url;
+      inner=link?`<a class="imgph" href="${esc(link)}" target="_blank" rel="noopener"><span class="ib">🖼</span>受信画像を開く（Drive保存済）</a>`
+                :`<span class="imgph"><span class="ib">🖼</span>受信画像（保存待ち）</span>`;
+    }else{inner=esc(m.body||'（'+m.mtype+'）');}
+    talk+=`<div class="msg ${side}">${inner}<div class="mt">${time}</div></div>`;
+  });
+  const saved=media.filter(m=>m.status==='saved');
+  const docs=saved.length?saved.map(m=>`<a class="doccell" href="${esc(m.drive_url)}" target="_blank" rel="noopener"><div class="dp">🖼</div><b>${esc(m.filename||'画像')}</b><span>Drive保存済</span></a>`).join('')
+    :`<div class="empty">保存済み画像なし（受信画像 ${media.length}件が保存待ち。毎時同期で順次Driveへ）</div>`;
+  const histRows=hist.length?hist.map(h=>`<div class="mrow"><span class="sub2" style="width:96px">${new Date(h.changed_at).toLocaleString('ja-JP',{month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'})}</span><span>${esc(h.from_mark||'—')} → <b>${esc(h.to_mark||'—')}</b></span></div>`).join(''):'<div class="empty">変更履歴なし（次回同期以降のマーク変更が記録されます）</div>';
+  $('detail-body').innerHTML=`
+    <div class="d-head"><div class="d-av">${esc(nm[0])}</div>
+      <div style="flex:1;min-width:200px"><h2>${esc(nm)}</h2>
+        <div class="sub2" style="margin-top:3px">UID ${esc((c.uid||'').slice(0,14))}… ・ 流入 ${c.added_at?new Date(c.added_at).toLocaleDateString('ja-JP'):'—'}</div></div>
+      <span class="b-mark" style="background:${markColor(c.taiou_mark)}1c;color:${markColor(c.taiou_mark)}"><span class="chip" style="background:${markColor(c.taiou_mark)}"></span>${esc(c.taiou_mark||'—')}</span>
+    </div>
+    <div class="d-grid">
+      <div class="panel"><div class="phead"><div class="sectitle">個別メモ（Lステップ）</div></div><div class="pbody">
+        ${c.memo?`<div class="memo">${esc(c.memo)}</div>`:'<div class="empty">メモなし</div>'}
+      </div></div>
+      <div class="panel">
+        <div class="rtabs" id="rtabs">
+          <button class="on" data-t="talk">トーク履歴 <span class="sub2">${msgs.length}</span></button>
+          <button data-t="docs">受信画像 <span class="sub2">${media.length}</span></button>
+          <button data-t="log">変更履歴</button>
+        </div>
+        <div class="rpane on" id="rp-talk"><div class="talk">${talk||'<div class="empty">トークなし</div>'}</div></div>
+        <div class="rpane" id="rp-docs"><div class="docgrid">${docs}</div></div>
+        <div class="rpane" id="rp-log">${histRows}</div>
+      </div>
+    </div>`;
+  document.querySelectorAll('#rtabs button').forEach(b=>b.onclick=()=>{
+    document.querySelectorAll('#rtabs button').forEach(x=>x.classList.remove('on'));b.classList.add('on');
+    document.querySelectorAll('.rpane').forEach(p=>p.classList.remove('on'));$('rp-'+b.dataset.t).classList.add('on');});
+}
+
+function loadLost(){
+  const bc=MARK_COUNTS||{};
+  const sect=(title,marks,color)=>{
+    const items=marks.map(m=>[m,bc[m]||0]).filter(x=>x[1]>0).sort((a,b)=>b[1]-a[1]);
+    const mx=Math.max(1,...items.map(x=>x[1]));
+    return `<div class="panel"><div class="phead"><div class="sectitle">${title}</div></div><div class="pbody">${items.map(([m,n])=>`<div class="mrow"><span class="chip" style="background:${color}"></span><span class="mname">${esc(m)}</span><span class="mbar" style="width:130px"><i style="width:${n/mx*100}%;background:${color}"></i></span><span class="mcount">${n}</span></div>`).join('')||'<div class="empty">なし</div>'}</div></div>`;
+  };
+  $('lost-body').innerHTML=`<div class="grid2" style="grid-template-columns:1fr 1fr">
+    ${sect('失注理由の内訳',['失注（資金なし）','失注（理由なし）','失注（アイミツ負け）','失注（返信なし）'],C.crit)}
+    ${sect('無効リードの内訳',['無効リード（案件外）','無効リード（低被害）','無効リード（被害前）','無効リード（凍結済み）','無効リード（依頼しない）'],C.grey)}
+  </div>`;
+}
+
+const TITLES={home:['ダッシュボード','実データ・全体サマリー'],list:['顧客リスト','対応マーク＝フェーズで管理'],detail:['顧客詳細','個別メモ・トーク・受信画像・変更履歴'],lost:['失注・無効分析','掘り起こせるリードを見つける'],soon:['分析','広告データ接続後に実数化']};
+function go(v){
+  document.querySelectorAll('.view').forEach(x=>x.classList.remove('on'));
+  $('v-'+v).classList.add('on');
+  document.querySelectorAll('#nav a').forEach(a=>a.classList.toggle('on',a.dataset.v===v));
+  $('t-title').textContent=TITLES[v][0];$('t-sub').textContent=TITLES[v][1];
+  window.scrollTo(0,0);
+  if(v==='lost')loadLost();
+}
+document.querySelectorAll('#nav a').forEach(a=>a.onclick=()=>{const v=a.dataset.v;go(v);if(v==='list')loadList();});
+
+(async()=>{
+  const t=localStorage.getItem('tg_token');
+  if(t){TOKEN=t;try{const r=await fetch(CFG.url+'/auth/v1/user',{headers:{apikey:CFG.key,Authorization:'Bearer '+t}});if(r.ok){ME=await r.json();startApp();return;}}catch(e){}localStorage.removeItem('tg_token');}
+})();
+</script>
+</body>
+</html>

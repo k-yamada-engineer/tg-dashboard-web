@@ -118,6 +118,31 @@
   .empty{padding:40px;text-align:center;color:var(--muted2);font-size:12px}
   .spin{width:22px;height:22px;border:2.5px solid var(--line);border-top-color:var(--orange);border-radius:50%;animation:sp .7s linear infinite;margin:40px auto}
   @keyframes sp{to{transform:rotate(360deg)}}
+  .seg{display:inline-flex;background:#E5EDF3;border-radius:5px;padding:3px;gap:2px}
+  .seg button{padding:4.5px 13px;border-radius:3.5px;font-size:12px;font-weight:600;color:var(--muted)}
+  .seg button.on{background:#fff;color:var(--navy);box-shadow:0 1px 2px rgba(45,62,80,.15);font-weight:700}
+  .toolbar{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+  .toolbar label{font-size:11px;font-weight:600;color:var(--muted)}
+  .toolbar select{border:1px solid var(--border);border-radius:5px;padding:6px 10px;font-size:12px;font-family:inherit;color:var(--text);background:var(--card)}
+  thead th.stick,tbody td.stick{position:sticky;left:0;background:var(--card);z-index:1;border-right:1px solid var(--line)}
+  thead th.stick{background:var(--bg);z-index:3}
+  .heat{border-radius:3px;padding:2px 7px;font-weight:600;display:inline-block;min-width:44px;text-align:right}
+  tr.total td{background:var(--bg);font-weight:700;border-top:1px solid var(--border)}
+  .fn2{display:flex;flex-direction:column;gap:7px}
+  .fn2 .row{display:grid;grid-template-columns:96px 1fr 96px;gap:10px;align-items:center;font-size:12px}
+  .fn2 .bar{height:22px;border-radius:3px;display:flex;align-items:center;color:#fff;font-weight:700;font-size:11px;padding-left:8px;min-width:30px}
+  .yjrow{display:grid;grid-template-columns:140px 80px 80px 1fr 74px 76px;gap:10px;align-items:center;padding:9px 4px;border-bottom:1px solid var(--line);font-size:12.5px}
+  .yjrow:last-child{border-bottom:none}
+  .pbar{height:8px;border-radius:4px;background:var(--grey-soft);overflow:hidden}.pbar i{display:block;height:100%;border-radius:4px}
+  .pace{font-size:10.5px;font-weight:700;padding:2px 8px;border-radius:9px;text-align:center}
+  .gedit input{width:76px;border:1px solid var(--border);border-radius:4px;padding:5px 7px;font-size:12px;text-align:right;font-family:inherit}
+  .setgrid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  .setcard{background:var(--card);border:1px solid var(--border);border-radius:6px;box-shadow:var(--shadow);padding:15px 17px}
+  .setcard .st{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+  .setcard .si{width:34px;height:34px;border-radius:6px;display:grid;place-items:center;font-size:15px;flex:none}
+  .setcard b{font-size:13px;color:var(--navy)}
+  .setcard .sd{font-size:11px;color:var(--muted);line-height:1.6}
+  .setcard code{background:var(--bg);border-radius:3px;padding:1px 6px;font-size:11px;color:var(--link)}
 
   /* ===== 書類ジェネレーター ===== */
   #docmodal{position:fixed;inset:0;background:rgba(20,30,42,.55);z-index:200;display:none}
@@ -211,8 +236,13 @@
       <a data-v="list"><span class="ic">☰</span>顧客リスト<span class="cnt" id="nav-total">…</span></a>
       <a data-v="detail" id="nav-detail" style="display:none"><span class="ic">◔</span>顧客詳細</a>
       <a data-v="lost"><span class="ic">◑</span>失注・無効分析</a>
-      <div class="nlabel">分析（広告データ接続後）</div>
-      <a data-v="soon"><span class="ic">▤</span>ファネル・ROI・予実</a>
+      <div class="nlabel">分析</div>
+      <a data-v="sales"><span class="ic">▤</span>営業分析</a>
+      <a data-v="mkt"><span class="ic">📣</span>マーケ分析</a>
+      <a data-v="yojitsu"><span class="ic">◎</span>予実管理</a>
+      <a data-v="goals"><span class="ic">🎯</span>目標設定</a>
+      <div class="nlabel">運用</div>
+      <a data-v="settings"><span class="ic">⚙</span>設定</a>
     </nav>
     <div class="railfoot"><span><span class="dot"></span> <span id="foot-sync">同期確認中</span></span><button id="logout">ログアウト</button></div>
   </aside>
@@ -232,9 +262,11 @@
       </section>
       <section class="view" id="v-detail"><div id="detail-body"><div class="empty">顧客リストから選択してください</div></div></section>
       <section class="view" id="v-lost"><div id="lost-body"><div class="spin"></div></div></section>
-      <section class="view" id="v-soon">
-        <div class="panel"><div class="pbody"><div class="note"><b>ファネル分析・KWクロス・広告ROI・予実管理</b>は、広告費スプレッドシートと友だち情報欄（被害額・送金方法・utm）の接続後に実数化されます。設計・画面はモック（v4）で確定済み。この画面は実データ接続待ちです。</div></div></div>
-      </section>
+      <section class="view" id="v-sales"><div id="sales-body"><div class="spin"></div></div></section>
+      <section class="view" id="v-mkt"><div id="mkt-body"><div class="spin"></div></div></section>
+      <section class="view" id="v-yojitsu"><div id="yj-body2"><div class="spin"></div></div></section>
+      <section class="view" id="v-goals"><div id="goals-body"><div class="spin"></div></div></section>
+      <section class="view" id="v-settings"><div id="settings-body"></div></section>
     </div>
   </div>
 </div>
@@ -631,7 +663,7 @@ function loadLost(){
   </div>`;
 }
 
-const TITLES={home:['ダッシュボード','実データ・全体サマリー'],list:['顧客リスト','対応マーク＝フェーズで管理'],detail:['顧客詳細','個別メモ・トーク・受信画像・変更履歴'],lost:['失注・無効分析','掘り起こせるリードを見つける'],soon:['分析','広告データ接続後に実数化']};
+const TITLES={home:['ダッシュボード','実データ・全体サマリー'],list:['顧客リスト','対応マーク＝フェーズで管理'],detail:['顧客詳細','個別メモ・トーク・受信画像・変更履歴'],lost:['失注・無効分析','掘り起こせるリードを見つける'],sales:['営業分析','月次ファネル・転換率（実データ）'],mkt:['マーケ分析','KW別ROAS・クロス分析（指標選択）'],yojitsu:['予実管理','目標 vs 実績・達成率'],goals:['目標設定','月間目標の編集'],settings:['設定','連携・ステータス']};
 function go(v){
   document.querySelectorAll('.view').forEach(x=>x.classList.remove('on'));
   $('v-'+v).classList.add('on');
@@ -639,8 +671,195 @@ function go(v){
   $('t-title').textContent=TITLES[v][0];$('t-sub').textContent=TITLES[v][1];
   window.scrollTo(0,0);
   if(v==='lost')loadLost();
+  if(v==='list')loadList();
+  if(v==='sales')loadSales();
+  if(v==='mkt')loadMkt();
+  if(v==='yojitsu')loadYojitsu();
+  if(v==='goals')loadGoals();
+  if(v==='settings')loadSettings();
 }
-document.querySelectorAll('#nav a').forEach(a=>a.onclick=()=>{const v=a.dataset.v;go(v);if(v==='list')loadList();});
+document.querySelectorAll('#nav a').forEach(a=>a.onclick=()=>go(a.dataset.v));
+
+/* ===== 共通集計: 月次顧客データ ===== */
+let SALES_CACHE=null;
+async function salesData(){
+  if(SALES_CACHE)return SALES_CACHE;
+  const rows=await apiAll('customers?select=added_at,mark_group,taiou_mark');
+  const M={};
+  rows.forEach(r=>{
+    const mo=(r.added_at||'').slice(0,7); if(!mo)return;
+    M[mo]=M[mo]||{mo,inflow:0,active:0,closing:0,soukyaku:0,invalid:0,lost:0,keiyaku:0};
+    M[mo].inflow++; M[mo][r.mark_group]=(M[mo][r.mark_group]||0)+1;
+    if(r.taiou_mark==='契約者（入金済み）')M[mo].keiyaku++;
+  });
+  SALES_CACHE=Object.values(M).sort((a,b)=>a.mo<b.mo?-1:1);
+  return SALES_CACHE;
+}
+
+/* ===== 営業分析 ===== */
+async function loadSales(){
+  try{
+    const M=await salesData();
+    const AOV=250000;
+    let html=`<div class="panel"><div class="phead"><div><div class="sectitle">月次ファネル（実データ）</div><div class="secsub">流入(LINE追加)→対応対象→契約者。対応対象＝アクティブ+クロージング+送客</div></div></div><div class="tablewrap"><table><thead><tr><th class="stick">月</th><th class="num">流入</th><th class="num">対応対象</th><th class="num">クロージング層</th><th class="num">契約者</th><th class="num">対応対象率</th><th class="num">契約率</th><th class="num">推定売上</th></tr></thead><tbody>`;
+    let t={inflow:0,tgt:0,cl:0,k:0};
+    M.forEach(m=>{const tgt=(m.active||0)+(m.closing||0)+(m.soukyaku||0);
+      t.inflow+=m.inflow;t.tgt+=tgt;t.cl+=(m.closing||0);t.k+=m.keiyaku;
+      html+=`<tr><td class="stick nm">${m.mo}</td><td class="num">${m.inflow}</td><td class="num">${tgt}</td><td class="num">${m.closing||0}</td><td class="num" style="font-weight:700;color:${C.good}">${m.keiyaku}</td><td class="num">${f1(pc(tgt,m.inflow))}%</td><td class="num">${f1(pc(m.keiyaku,tgt))}%</td><td class="num">${yen(m.keiyaku*AOV)}</td></tr>`;});
+    html+=`<tr class="total"><td class="stick">合計</td><td class="num">${t.inflow}</td><td class="num">${t.tgt}</td><td class="num">${t.cl}</td><td class="num" style="color:${C.good}">${t.k}</td><td class="num">${f1(pc(t.tgt,t.inflow))}%</td><td class="num">${f1(pc(t.k,t.tgt))}%</td><td class="num">${yen(t.k*AOV)}</td></tr></tbody></table></div></div>`;
+    // 転換率まとめ
+    const last=M[M.length-1]||{};
+    html+=`<div class="grid2" style="grid-template-columns:1fr 1fr"><div class="panel"><div class="phead"><div class="sectitle">直近月の内訳（${last.mo||'-'}）</div></div><div class="pbody"><div class="fn2">`;
+    [['流入',last.inflow||0,C.navy],['アクティブ・追客',last.active||0,C.link],['クロージング',last.closing||0,C.good],['送客',last.soukyaku||0,C.purple],['契約者',last.keiyaku||0,C.good]].forEach((x,i,arr)=>{const mx=arr[0][1]||1;html+=`<div class="row"><span>${x[0]}</span><div class="bar" style="width:${Math.max(x[1]/mx*100,6)}%;background:${x[2]}">${x[1]}</div><span class="sub2"></span></div>`;});
+    html+=`</div></div></div><div class="panel"><div class="phead"><div class="sectitle">累計サマリー</div></div><div class="pbody"><div class="kv">
+      <div class="r"><span class="kk">総流入</span><span class="vv">${t.inflow.toLocaleString()}</span></div>
+      <div class="r"><span class="kk">契約者（受任）</span><span class="vv" style="color:${C.good}">${t.k}</span></div>
+      <div class="r"><span class="kk">全体契約率（契約/対応対象）</span><span class="vv">${f1(pc(t.k,t.tgt))}%</span></div>
+      <div class="r"><span class="kk">推定累計売上（@¥250,000）</span><span class="vv">${yen(t.k*AOV)}</span></div>
+    </div><div class="note" style="margin-top:10px"><b>担当者別（迫田/下沢）</b>は、Lステップ「営業入力用」タブの担当者IDを接続後に表示されます。</div></div></div></div>`;
+    $('sales-body').innerHTML=html;
+  }catch(e){$('sales-body').innerHTML=`<div class="empty">エラー: ${esc(e.message)}</div>`;}
+}
+
+/* ===== マーケ分析（KW別ROAS・クロス分析・指標選択） ===== */
+let AD_CACHE=null, mktAxis='kw', mktMetric='cost', mktAOV=250000;
+async function loadMkt(){
+  try{
+    if(!AD_CACHE)AD_CACHE=await apiAll('ad_kw?select=kw,match_type,month,cost,quote_cnt,won_cnt,cpo');
+    renderMkt();
+  }catch(e){$('mkt-body').innerHTML=`<div class="empty">エラー: ${esc(e.message)}</div>`;}
+}
+const MKT_METRICS={
+  cost:['広告費',r=>r.cost,'yen'], quote:['見積提出',r=>r.quote,'int'], won:['成約数',r=>r.won,'int'],
+  cpo:['CPO（成約単価）',r=>r.won?r.cost/r.won:0,'yen'], wonrate:['成約率',r=>pc(r.won,r.quote),'pct'],
+  sales:['推定売上',r=>r.won*mktAOV,'yen'], roas:['推定ROAS',r=>r.cost?r.won*mktAOV/r.cost:0,'roas'],
+};
+function fmtM(v,t){if(t==='yen')return yen(v);if(t==='pct')return f1(v)+'%';if(t==='roas')return (v).toFixed(2);return Math.round(v).toLocaleString();}
+function renderMkt(){
+  const rows=AD_CACHE.map(r=>({kw:r.kw,match:r.match_type,month:r.month,cost:+r.cost||0,quote:+r.quote_cnt||0,won:+r.won_cnt||0}));
+  const tot=rows.reduce((s,r)=>({cost:s.cost+r.cost,quote:s.quote+r.quote,won:s.won+r.won}),{cost:0,quote:0,won:0});
+  const estSales=tot.won*mktAOV, roas=tot.cost?estSales/tot.cost:0;
+  const kpi=(l,v,c,s)=>`<div class="kpi"><div class="k-lab">${l}</div><div class="k-val" style="color:${c};font-size:21px">${v}</div><div class="k-sub">${s||''}</div></div>`;
+  let html=`<div class="kpis">
+    ${kpi('総広告費',yen(tot.cost),C.navy,'KW実データ')}
+    ${kpi('成約数',tot.won,C.good,'見積提出 '+tot.quote)}
+    ${kpi('CPO（成約単価）',tot.won?yen(tot.cost/tot.won):'—',C.orange,'広告費÷成約')}
+    ${kpi('推定ROAS',roas.toFixed(2),roas>=1?C.good:C.crit,'売上¥'+Math.round(estSales/10000)+'万÷広告費')}
+  </div>`;
+  // クロス分析（軸×指標 選択）
+  html+=`<div class="panel"><div class="phead"><div><div class="sectitle">クロス分析</div><div class="secsub">軸と指標を選んでKW広告データを分解</div></div>
+    <div class="toolbar">
+      <label>軸</label><select id="mkt-axis">${[['kw','検索KW'],['match','マッチタイプ'],['month','月']].map(o=>`<option value="${o[0]}" ${mktAxis===o[0]?'selected':''}>${o[1]}</option>`).join('')}</select>
+      <label>指標</label><select id="mkt-metric">${Object.entries(MKT_METRICS).map(([k,v])=>`<option value="${k}" ${mktMetric===k?'selected':''}>${v[0]}</option>`).join('')}</select>
+      <label>平均単価</label><select id="mkt-aov">${[200000,250000,300000].map(a=>`<option value="${a}" ${mktAOV===a?'selected':''}>¥${(a/10000)}万</option>`).join('')}</select>
+    </div></div><div class="tablewrap" id="mkt-cross"></div></div>`;
+  // KW×月 全表
+  html+=`<div class="panel"><div class="phead"><div><div class="sectitle">KW × 月 明細（広告費順）</div><div class="secsub">広告費 / 見積提出 / 成約 / CPO / 推定ROAS</div></div></div><div class="tablewrap" style="max-height:520px;overflow:auto" id="mkt-table"></div></div>`;
+  $('mkt-body').innerHTML=html;
+  $('mkt-axis').onchange=e=>{mktAxis=e.target.value;renderCross();};
+  $('mkt-metric').onchange=e=>{mktMetric=e.target.value;renderCross();};
+  $('mkt-aov').onchange=e=>{mktAOV=+e.target.value;renderMkt();};
+  renderCross(); renderMktTable(rows);
+}
+function renderCross(){
+  const rows=AD_CACHE.map(r=>({kw:r.kw,match:r.match_type,month:r.month,cost:+r.cost||0,quote:+r.quote_cnt||0,won:+r.won_cnt||0}));
+  const g={};
+  rows.forEach(r=>{const k=r[mktAxis];g[k]=g[k]||{k,cost:0,quote:0,won:0};g[k].cost+=r.cost;g[k].quote+=r.quote;g[k].won+=r.won;});
+  const mf=MKT_METRICS[mktMetric];
+  let arr=Object.values(g).map(x=>({...x,val:mf[1](x)}));
+  arr.sort((a,b)=>b.val-a.val);
+  const mx=Math.max(...arr.map(a=>a.val),1);
+  const AXN={kw:'検索KW',match:'マッチタイプ',month:'月'};
+  let html=`<table><thead><tr><th class="stick">${AXN[mktAxis]}</th><th class="num">広告費</th><th class="num">見積提出</th><th class="num">成約</th><th class="num">${mf[0]}</th><th style="width:160px"></th></tr></thead><tbody>`;
+  arr.forEach(a=>{html+=`<tr><td class="stick nm">${esc(a.k)}</td><td class="num">${yen(a.cost)}</td><td class="num">${a.quote}</td><td class="num">${a.won}</td>
+    <td class="num" style="font-weight:700">${fmtM(a.val,mf[2])}</td>
+    <td><div class="mbar" style="width:150px"><i style="width:${Math.max(a.val/mx*100,1)}%;background:${C.orange}"></i></div></td></tr>`;});
+  html+='</tbody></table>';
+  $('mkt-cross').innerHTML=html;
+}
+function renderMktTable(rows){
+  rows.sort((a,b)=>b.cost-a.cost);
+  let html=`<table><thead><tr><th class="stick">検索KW</th><th>マッチ</th><th>月</th><th class="num">広告費</th><th class="num">見積</th><th class="num">成約</th><th class="num">CPO</th><th class="num">推定ROAS</th></tr></thead><tbody>`;
+  rows.forEach(r=>{const roas=r.cost?r.won*mktAOV/r.cost:0;
+    html+=`<tr><td class="stick nm">${esc(r.kw)}</td><td class="sub2">${esc(r.match)}</td><td class="sub2">${r.month}</td>
+    <td class="num">${yen(r.cost)}</td><td class="num">${r.quote}</td><td class="num">${r.won}</td>
+    <td class="num">${r.won?yen(r.cost/r.won):'—'}</td>
+    <td class="num"><span class="heat" style="${roas>=2?'background:'+C.good+'22;color:'+C.good:roas>0?'':''}">${roas?roas.toFixed(2):'—'}</span></td></tr>`;});
+  html+='</tbody></table>';
+  $('mkt-table').innerHTML=html;
+}
+
+/* ===== 予実管理 ===== */
+async function loadYojitsu(){
+  try{
+    const M=await salesData();
+    const goals=await api('goals?select=month,key,target');
+    const gmap={}; goals.forEach(g=>{gmap[g.month]=gmap[g.month]||{};gmap[g.month][g.key]=+g.target;});
+    const months=[...new Set([...M.map(m=>m.mo),...Object.keys(gmap)])].sort();
+    const cur=months[months.length-1];
+    const act=M.find(m=>m.mo===cur)||{};
+    const g=gmap[cur]||{};
+    const AOV=250000;
+    const actuals={inflow:act.inflow||0,keiyaku:act.keiyaku||0,revenue:(act.keiyaku||0)*AOV};
+    const items=[['inflow','流入（LINE追加）',actuals.inflow],['keiyaku','契約者（受任）',actuals.keiyaku],['revenue','売上（推定）',actuals.revenue]];
+    let html=`<div class="panel"><div class="phead"><div><div class="sectitle">予実管理 ${cur||''}</div><div class="secsub">目標は「目標設定」で編集</div></div><button class="btn" style="background:var(--card);border:1px solid var(--border);color:var(--muted);padding:6px 12px;border-radius:5px" onclick="go('goals')">目標を設定 ›</button></div><div class="pbody">`;
+    if(!goals.length)html+=`<div class="note" style="margin-bottom:12px">まだ目標が未設定です。「目標を設定」から入力すると達成率が表示されます。</div>`;
+    html+=`<div class="yjrow" style="font-size:10px;font-weight:700;color:var(--muted);border-bottom:1px solid var(--border)"><span>KPI</span><span style="text-align:right">実績</span><span style="text-align:right">目標</span><span>進捗</span><span style="text-align:right">達成率</span><span style="text-align:center">判定</span></div>`;
+    items.forEach(it=>{const tg=g[it[0]]||0;const rate=tg?pc(it[2],tg):0;const isMoney=it[0]==='revenue';
+      const barC=rate>=90?C.good:rate>=60?C.warn:C.crit;
+      html+=`<div class="yjrow"><span class="nm">${it[1]}</span>
+        <span class="num" style="text-align:right;font-weight:700">${isMoney?yen(it[2]):it[2].toLocaleString()}</span>
+        <span class="num" style="text-align:right;color:var(--muted)">${tg?(isMoney?yen(tg):tg.toLocaleString()):'—'}</span>
+        <span class="pbar"><i style="width:${Math.min(rate,100)}%;background:${barC}"></i></span>
+        <span class="num" style="text-align:right;font-weight:800;color:${barC}">${tg?f1(rate)+'%':'—'}</span>
+        <span class="pace" style="background:${rate>=90?'var(--good-soft)':rate>=60?'var(--warn-soft)':'var(--crit-soft)'};color:${barC}">${tg?(rate>=90?'達成':rate>=60?'追う':'未達'):'-'}</span></div>`;});
+    html+=`</div></div>`;
+    $('yj-body2').innerHTML=html;
+  }catch(e){$('yj-body2').innerHTML=`<div class="empty">エラー: ${esc(e.message)}</div>`;}
+}
+
+/* ===== 目標設定 ===== */
+async function loadGoals(){
+  try{
+    const M=await salesData();
+    const goals=await api('goals?select=month,key,target');
+    const gmap={}; goals.forEach(g=>{gmap[g.month]=gmap[g.month]||{};gmap[g.month][g.key]=+g.target;});
+    const months=M.map(m=>m.mo).slice(-6);
+    const keys=[['inflow','流入'],['keiyaku','契約者'],['revenue','売上（円）']];
+    let html=`<div class="panel"><div class="phead"><div><div class="sectitle">月間目標の設定</div><div class="secsub">数値を入力して保存。予実管理に反映されます</div></div><button class="btn" id="gsave" style="background:var(--orange);color:#fff;padding:8px 16px;border-radius:5px;font-weight:700">保存</button></div>
+      <div class="tablewrap"><table class="gedit"><thead><tr><th class="stick">月</th>${keys.map(k=>`<th class="num">${k[1]}</th>`).join('')}</tr></thead><tbody>`;
+    months.forEach(mo=>{html+=`<tr><td class="stick nm">${mo}</td>${keys.map(k=>`<td class="num"><input data-mo="${mo}" data-key="${k[0]}" value="${(gmap[mo]&&gmap[mo][k[0]])||''}" inputmode="numeric"></td>`).join('')}</tr>`;});
+    html+=`</tbody></table></div></div>`;
+    $('goals-body').innerHTML=html;
+    $('gsave').onclick=saveGoals;
+  }catch(e){$('goals-body').innerHTML=`<div class="empty">エラー: ${esc(e.message)}</div>`;}
+}
+async function saveGoals(){
+  const rows=[];
+  document.querySelectorAll('#goals-body input').forEach(i=>{const v=parseInt((i.value||'').replace(/[^0-9]/g,''),10);
+    if(isFinite(v)&&v>0)rows.push({month:i.dataset.mo,key:i.dataset.key,target:v});});
+  try{
+    await fetch(`${CFG.url}/rest/v1/goals?on_conflict=month,key`,{method:'POST',
+      headers:{apikey:CFG.key,Authorization:'Bearer '+TOKEN,'Content-Type':'application/json',Prefer:'resolution=merge-duplicates,return=minimal'},
+      body:JSON.stringify(rows)});
+    alert('目標を保存しました（'+rows.length+'件）');
+  }catch(e){alert('保存エラー: '+e.message);}
+}
+
+/* ===== 設定 ===== */
+function loadSettings(){
+  const card=(ic,ib,ict,name,status,sc,body)=>`<div class="setcard"><div class="st"><span class="si" style="background:${ib};color:${ict}">${ic}</span><div><b>${name}</b></div><span class="badge" style="margin-left:auto;background:${sc}1c;color:${sc}">● ${status}</span></div><div class="sd">${body}</div></div>`;
+  $('settings-body').innerHTML=`<div class="eyebrow" style="font-size:10px;font-weight:700;letter-spacing:.12em;color:var(--muted2);margin-bottom:8px">CONNECTIONS</div>
+  <div class="setgrid">
+    ${card('💬','var(--good-soft)',C.good,'Lステップ API','接続済み',C.good,'顧客・対応マーク・トーク履歴の同期元。毎時同期（GitHub Actions）。')}
+    ${card('📣','var(--good-soft)',C.good,'広告KWデータ','一部接続',C.warn,'KW別ROAS自動化シートから広告費・成約データを取込。<br>現在：上位KW実データ48件を投入済み。<code>全件自動同期はSheets API有効化後</code>')}
+    ${card('🖼','var(--link-soft)',C.link,'受信画像プール','手動運用',C.warn,'LINEコンテンツAPI→Drive。過去82枚保存済み。自動化は共有ドライブ導入で対応予定。')}
+    ${card('📄','var(--navy-soft)',C.navy,'書類テンプレート','稼働中',C.good,'口座凍結要請書（3ページFAX）を案件詳細から生成。会社情報は自動挿入。')}
+    ${card('🔒','var(--good-soft)',C.good,'アクセス権限（PII保護）','有効',C.good,'ログイン必須（Supabase Auth）。未ログインでは顧客データは一切読めない。')}
+    ${card('🎯','var(--orange-soft)',C.orange,'見込み判定ルール','稼働中',C.good,'有効＝被害あり×1ヶ月以内×100万↑×銀行振込。暗号資産→送客。')}
+  </div>
+  <div class="note" style="margin-top:16px"><b>スケジュール（カレンダー）機能は不要</b>との方針で除外しています。営業入力用の担当者ID／被害額・送金方法・utmの実表示は、Lステップ友だち情報欄IDの接続で有効化します。</div>`;
+}
 
 (async()=>{
   const t=localStorage.getItem('tg_token');

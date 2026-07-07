@@ -282,6 +282,9 @@ const $=id=>document.getElementById(id);
 const C={navy:'#33475B',orange:'#FF7A59',good:'#00A88F',warn:'#DFA100',crit:'#F2545B',link:'#0091AE',purple:'#6A78D1',grey:'#7C98B6'};
 let TOKEN=null, ME=null;
 const esc=s=>(s==null?'':String(s)).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const yen=n=>'¥'+Math.round(+n||0).toLocaleString('ja-JP');
+const f1=n=>(+n||0).toFixed(1);
+const pc=(a,b)=>b?(a/b*100):0;
 
 async function api(path){
   const r=await fetch(CFG.url+'/rest/v1/'+path,{headers:{apikey:CFG.key,Authorization:'Bearer '+TOKEN}});

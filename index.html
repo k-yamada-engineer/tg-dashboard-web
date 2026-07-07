@@ -256,6 +256,17 @@ async function api(path){
   if(!r.ok)throw new Error('API '+r.status);
   return r.json();
 }
+// PostgRESTの1000件上限を越えて全件取得（Rangeでページング）
+async function apiAll(path){
+  let out=[],from=0,step=1000;
+  for(;;){
+    const r=await fetch(CFG.url+'/rest/v1/'+path,{headers:{apikey:CFG.key,Authorization:'Bearer '+TOKEN,Range:from+'-'+(from+step-1)}});
+    if(!r.ok)throw new Error('API '+r.status);
+    const rows=await r.json(); out=out.concat(rows);
+    if(rows.length<step)break; from+=step;
+  }
+  return out;
+}
 async function count(path){
   const r=await fetch(CFG.url+'/rest/v1/'+path,{headers:{apikey:CFG.key,Authorization:'Bearer '+TOKEN,Prefer:'count=exact',Range:'0-0'}});
   return +((r.headers.get('content-range')||'/0').split('/')[1])||0;
@@ -298,7 +309,7 @@ async function loadFooter(){
 let MARK_COUNTS=null;
 async function loadHome(){
   try{
-    const rows=await api('customers?select=taiou_mark,mark_group&limit=5000');
+    const rows=await apiAll('customers?select=taiou_mark,mark_group');
     const total=rows.length, byMark={}, byGroup={};
     rows.forEach(r=>{const m=r.taiou_mark||'（マーク無し）';byMark[m]=(byMark[m]||0)+1;byGroup[r.mark_group]=(byGroup[r.mark_group]||0)+1;});
     MARK_COUNTS=byMark; $('nav-total').textContent=total;

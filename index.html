@@ -118,6 +118,69 @@
   .empty{padding:40px;text-align:center;color:var(--muted2);font-size:12px}
   .spin{width:22px;height:22px;border:2.5px solid var(--line);border-top-color:var(--orange);border-radius:50%;animation:sp .7s linear infinite;margin:40px auto}
   @keyframes sp{to{transform:rotate(360deg)}}
+
+  /* ===== 書類ジェネレーター ===== */
+  #docmodal{position:fixed;inset:0;background:rgba(20,30,42,.55);z-index:200;display:none}
+  #docmodal.on{display:grid;grid-template-columns:400px 1fr}
+  .docform{background:var(--card);height:100vh;overflow:auto;padding:20px 22px;box-shadow:2px 0 12px rgba(0,0,0,.15)}
+  .docform h2{font-size:16px;color:var(--navy);margin-bottom:3px}
+  .docform .fsub{font-size:11.5px;color:var(--muted);margin-bottom:16px}
+  .fgrp{margin-bottom:16px}
+  .fgrp .fh{font-size:11px;font-weight:700;color:var(--orange-d);letter-spacing:.04em;margin-bottom:8px;padding-bottom:5px;border-bottom:1px solid var(--line)}
+  .frow{margin-bottom:9px}
+  .frow label{font-size:10.5px;font-weight:600;color:var(--muted);display:block;margin-bottom:3px}
+  .frow input,.frow select,.frow textarea{width:100%;border:1px solid var(--border);border-radius:5px;padding:7px 9px;font-size:12.5px;font-family:inherit;color:var(--text)}
+  .frow input:focus,.frow select:focus,.frow textarea:focus{outline:2px solid var(--link-soft);border-color:var(--link)}
+  .frow.two{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  .fauto{background:var(--navy-soft);border-radius:6px;padding:10px 12px;font-size:11px;color:var(--muted);line-height:1.6}
+  .fauto b{color:var(--navy)}
+  .radio-inline{display:flex;gap:12px;flex-wrap:wrap;font-size:12px;padding:4px 0}
+  .radio-inline label{display:flex;gap:4px;align-items:center;font-weight:500;color:var(--text);cursor:pointer}
+  .docimg-pick{display:flex;flex-direction:column;gap:8px}
+  .docimg-preview{max-width:100%;max-height:160px;border:1px solid var(--border);border-radius:6px;object-fit:contain;background:var(--bg)}
+  .docbar{position:sticky;bottom:0;background:var(--card);border-top:1px solid var(--border);padding:12px 0 4px;margin-top:8px;display:flex;gap:8px}
+  .docbar button{flex:1;border-radius:6px;padding:10px;font-weight:700;font-size:12.5px}
+  .docbar .close{background:var(--card);border:1px solid var(--border);color:var(--muted)}
+  .docbar .print{background:var(--orange);color:#fff}.docbar .print:hover{background:var(--orange-d)}
+  .docbar .sent{background:var(--good);color:#fff}
+  .docprev-wrap{overflow:auto;height:100vh;padding:26px;display:flex;flex-direction:column;align-items:center;gap:20px}
+
+  /* A4書面 */
+  .a4{background:#fff;width:210mm;min-height:297mm;padding:20mm 18mm;box-shadow:0 3px 16px rgba(0,0,0,.25);font-family:"Hiragino Mincho ProN","Yu Mincho",YuMincho,serif;color:#111;font-size:10.5pt;line-height:1.9;position:relative}
+  .a4 .tt{text-align:center;font-size:20pt;font-weight:700;letter-spacing:.3em;padding:0 0 4px;margin:6px 0 20px;border-top:1.5px solid #111;border-bottom:1.5px solid #111;display:inline-block;left:50%;position:relative;transform:translateX(-50%)}
+  .a4 .ttwrap{text-align:center}
+  .fax-top{display:flex;justify-content:space-between;gap:30px;margin-top:10px}
+  .fax-left{flex:1}
+  .fax-left .r{display:flex;gap:8px;align-items:flex-end;margin-bottom:14px}
+  .fax-left .r .k{white-space:nowrap;letter-spacing:.3em}
+  .fax-left .r .v{flex:1;border-bottom:1px solid #111;padding:0 4px 2px}
+  .fax-right{width:52%;font-size:10pt;line-height:1.85}
+  .fax-right .fname{font-weight:700;font-size:11pt;margin-bottom:6px}
+  .hr-thick{border:none;border-top:3px solid #111;margin:22px 0}
+  .center{text-align:center}
+  .doc-note{font-size:8.5pt;color:#333;margin-bottom:6px}
+  .doc-date{text-align:right;letter-spacing:.15em;margin:4px 0 14px}
+  .chk{display:inline-block;width:1em;text-align:center}
+  .u{border-bottom:1px solid #111;padding:0 6px;display:inline-block;min-width:2em}
+  .box{border:1px solid #111;padding:8px 10px;margin:6px 0;min-height:2.4em}
+  .lead{margin:14px 0;text-indent:1em;line-height:2}
+  .lead b{font-weight:700}
+  .num{margin:12px 0 4px;font-weight:600}
+  .dmg-grid{display:flex;gap:16px;margin-top:24px}
+  .dmg-img{width:46%}
+  .dmg-img img{width:100%;border:1px solid #ccc}
+  .dmg-box{flex:1;border:1px solid #111;padding:14px 16px;line-height:2.2;height:fit-content}
+  .stamp{display:inline-block;color:#c0392b;border:1.5px solid #c0392b;border-radius:50%;width:2.6em;height:2.6em;line-height:1.2;text-align:center;font-size:7pt;transform:rotate(-8deg);margin:0 4px;vertical-align:middle;padding-top:.4em}
+
+  @media print{
+    body{background:#fff}
+    .app,#docmodal .docform,.docbar,.top,.rail{display:none!important}
+    #docmodal{position:static;display:block;background:#fff}
+    #docmodal.on{display:block}
+    .docprev-wrap{height:auto;padding:0;display:block}
+    .a4{box-shadow:none;margin:0;width:auto;min-height:auto;padding:14mm 16mm;page-break-after:always}
+    .a4:last-child{page-break-after:auto}
+  }
 </style>
 </head>
 <body>
@@ -174,6 +237,11 @@
       </section>
     </div>
   </div>
+</div>
+
+<div id="docmodal">
+  <div class="docform" id="docform"></div>
+  <div class="docprev-wrap" id="docprev"></div>
 </div>
 
 <script>
@@ -338,7 +406,8 @@ function renderDetail(c,msgs,media,hist){
   $('detail-body').innerHTML=`
     <div class="d-head"><div class="d-av">${esc(nm[0])}</div>
       <div style="flex:1;min-width:200px"><h2>${esc(nm)}</h2>
-        <div class="sub2" style="margin-top:3px">UID ${esc((c.uid||'').slice(0,14))}… ・ 流入 ${c.added_at?new Date(c.added_at).toLocaleDateString('ja-JP'):'—'}</div></div>
+        <div class="sub2" style="margin-top:3px">UID ${esc((c.uid||'').slice(0,14))}… ・ 流入 ${c.added_at?new Date(c.added_at).toLocaleDateString('ja-JP'):'—'}${c.doc_status?` ・ <b style="color:var(--good)">📄 ${esc(c.doc_status)}</b>`:''}</div></div>
+      <button class="btn" id="docbtn" style="background:var(--orange);color:#fff;font-weight:700;border-radius:5px;padding:9px 16px">📄 資料作成</button>
       <span class="b-mark" style="background:${markColor(c.taiou_mark)}1c;color:${markColor(c.taiou_mark)}"><span class="chip" style="background:${markColor(c.taiou_mark)}"></span>${esc(c.taiou_mark||'—')}</span>
     </div>
     <div class="d-grid">
@@ -359,6 +428,183 @@ function renderDetail(c,msgs,media,hist){
   document.querySelectorAll('#rtabs button').forEach(b=>b.onclick=()=>{
     document.querySelectorAll('#rtabs button').forEach(x=>x.classList.remove('on'));b.classList.add('on');
     document.querySelectorAll('.rpane').forEach(p=>p.classList.remove('on'));$('rp-'+b.dataset.t).classList.add('on');});
+  $('docbtn').onclick=()=>openDocBuilder(c);
+}
+
+/* ===== 書類ジェネレーター（口座凍結要請書） ===== */
+const FIRM={name:'徳永高法律事務所',lawyer:'徳永 高',zip:'810-0034',addr:'福岡県福岡市中央区笹丘2-26-15',tel:'092-600-7694',fax:'092-600-7694',bar:'福岡弁護士会',reg:'20980'};
+const TEGUCHI=['オレオレ詐欺','架空請求','融資保証金詐欺','還付金詐欺','ヤミ金融','その他'];
+const BANK_FAX={'ゆうちょ銀行':'045(944)4827'};
+let DOC={}; // 現在の入力
+function parseMemo(memo){ // メモから住所/電話/被害額/口座情報をゆるく抽出
+  const m=memo||'', g={};
+  const tel=m.match(/0\d{1,3}[-\s]?\d{2,4}[-\s]?\d{3,4}/); if(tel)g.tel=tel[0];
+  const amt=m.match(/被害金額[：:]\s*([\d,]+)\s*万?円/); if(amt)g.dmg=amt[1];
+  return g;
+}
+function openDocBuilder(c){
+  const g=parseMemo(c.memo);
+  const today=new Date();
+  DOC={
+    // 送信先
+    bankName:'ゆうちょ銀行', bankDept:'', destFax:'', police:false,
+    sendY:today.getFullYear()-2018, sendM:today.getMonth()+1, sendD:today.getDate(),
+    // 被害者
+    vName:c.name||'', vKana:'', vAddr:'',
+    // 対象口座（詐欺口座）
+    acBankType:'ゆうちょ銀行', acBranch:'', acType:'普通', acNo:'', acName:'',
+    // 手口
+    teguchi:'その他', teguchiOther:'投資詐欺',
+    // 被害明細
+    txDate:'', txAmount:'', refDoc:'振込み控え',
+    imgData:null,
+    _cid:c.id,
+  };
+  document.getElementById('docmodal').classList.add('on');
+  renderDocForm(); renderDocPreview();
+  // 顧客の保存画像を候補として読み込み（Driveフォルダは開ける／埋め込みはアップロード）
+}
+function bindDoc(){
+  document.querySelectorAll('#docform [data-k]').forEach(el=>{
+    el.oninput=el.onchange=()=>{
+      const k=el.dataset.k;
+      DOC[k]= el.type==='checkbox'?el.checked:el.value;
+      renderDocPreview();
+    };
+  });
+  const fi=document.getElementById('docimg');
+  if(fi)fi.onchange=e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{DOC.imgData=r.result;renderDocPreview();document.getElementById('docimgprev').src=r.result;document.getElementById('docimgprev').style.display='block';};r.readAsDataURL(f);};
+}
+function renderDocForm(){
+  const inp=(k,label,ph)=>`<div class="frow"><label>${label}</label><input data-k="${k}" value="${esc(DOC[k]||'')}" placeholder="${ph||''}"></div>`;
+  document.getElementById('docform').innerHTML=`
+    <h2>口座凍結要請書の作成</h2><div class="fsub">被害者情報を入力／会社情報は自動挿入されます</div>
+    <div class="fgrp"><div class="fh">① 送信先（金融機関 / 警察）</div>
+      ${inp('bankName','金融機関名（宛先）','ゆうちょ銀行')}
+      ${inp('bankDept','部署名','横浜貯金事務センター 等')}
+      ${inp('destFax','送信先FAX番号','045(944)4827')}
+      <div class="frow"><label>送付日（令和）</label><div class="frow two" style="margin:0"><input data-k="sendY" value="${DOC.sendY}" style="width:100%"><div class="frow two" style="margin:0"><input data-k="sendM" value="${DOC.sendM}"><input data-k="sendD" value="${DOC.sendD}"></div></div></div>
+      <div class="frow"><label><input type="checkbox" data-k="police" ${DOC.police?'checked':''}> 警察にも送付する</label></div>
+    </div>
+    <div class="fgrp"><div class="fh">② 被害者</div>
+      ${inp('vName','氏名','櫻井 聡美')}
+      ${inp('vKana','フリガナ','サクライ サトミ')}
+      ${inp('vAddr','住所','岩手県北上市…')}
+    </div>
+    <div class="fgrp"><div class="fh">③ 対象口座（詐欺口座）</div>
+      <div class="frow"><label>金融機関種別</label><select data-k="acBankType">${['ゆうちょ銀行','銀行','信用金庫','信用組合'].map(o=>`<option ${DOC.acBankType===o?'selected':''}>${o}</option>`).join('')}</select></div>
+      ${inp('acBranch','店名（支店）','〇八八 等')}
+      <div class="frow"><label>口座種別</label><select data-k="acType">${['普通','当座','その他'].map(o=>`<option ${DOC.acType===o?'selected':''}>${o}</option>`).join('')}</select></div>
+      ${inp('acNo','口座番号','1659111')}
+      ${inp('acName','口座名義人','ウシオ カツヒコ')}
+    </div>
+    <div class="fgrp"><div class="fh">④ 手口</div>
+      <div class="frow"><label>手口</label><select data-k="teguchi">${TEGUCHI.map(o=>`<option ${DOC.teguchi===o?'selected':''}>${o}</option>`).join('')}</select></div>
+      ${inp('teguchiOther','その他の場合の内容','投資詐欺')}
+    </div>
+    <div class="fgrp"><div class="fh">⑤ 被害明細（3ページ目）</div>
+      ${inp('txDate','振込日','2026年6月18日')}
+      ${inp('txAmount','振込金額','443,157円')}
+      <div class="frow"><label>参考書類</label><select data-k="refDoc">${['振込み控え','ダイレクトメール','チラシ','その他'].map(o=>`<option ${DOC.refDoc===o?'selected':''}>${o}</option>`).join('')}</select></div>
+      <div class="frow"><label>振込明細の画像（この案件のDriveフォルダから選んでアップロード）</label>
+        <div class="docimg-pick">
+          <input type="file" id="docimg" accept="image/*">
+          <img id="docimgprev" class="docimg-preview" style="display:none">
+        </div>
+      </div>
+    </div>
+    <div class="fgrp"><div class="fh">会社情報（自動挿入）</div>
+      <div class="fauto"><b>${FIRM.name}</b> ／ 弁護士：${FIRM.lawyer}<br>〒${FIRM.zip} ${FIRM.addr}<br>TEL ${FIRM.tel} ／ FAX ${FIRM.fax}<br>${FIRM.bar}・登録番号 ${FIRM.reg}</div>
+    </div>
+    <div class="docbar">
+      <button class="close" onclick="closeDoc()">閉じる</button>
+      <button class="print" onclick="window.print()">🖨 プレビュー印刷 / PDF化</button>
+      <button class="sent" onclick="markDocSent()">✓ 送付済みにする</button>
+    </div>`;
+  bindDoc();
+}
+function chk(on){return on?'☑':'□';}
+function renderDocPreview(){
+  const d=DOC, total=3;
+  // Page1: FAX送信状
+  const p1=`<div class="a4">
+    <div class="ttwrap"><span class="tt">ＦＡＸ　送信状</span></div>
+    <div class="fax-top">
+      <div class="fax-left">
+        <div class="r"><span class="k">会社名</span><span class="v">${esc(d.bankName)}　御中</span></div>
+        <div class="r"><span class="k">部署名</span><span class="v">${esc(d.bankDept)}</span></div>
+        <div class="r"><span class="k">氏　名</span><span class="v"></span></div>
+      </div>
+      <div class="fax-right">
+        <div class="fname">${FIRM.name}</div>
+        弁護士：${FIRM.lawyer}<br>〒${FIRM.zip}<br>${FIRM.addr}<br>TEL: ${FIRM.tel}<br>FAX: ${FIRM.fax}<br>
+        送付日：令和${d.sendY}年${d.sendM}月${d.sendD}日<br>
+        合計：　　${total}　　枚<br><span style="font-size:9pt">（このページを含む）</span>
+      </div>
+    </div>
+    <hr class="hr-thick">
+    <div class="center" style="margin:40px 0 24px;letter-spacing:.4em">記</div>
+    <div class="center" style="line-height:2.6">振り込め詐欺等不正請求口座情報提供及び要請書　１枚<br>添付資料（明細書）　１枚</div>
+    <div style="text-align:right;margin-top:60px">以上</div>
+  </div>`;
+  // Page2: 要請書
+  const isYucho=d.acBankType==='ゆうちょ銀行';
+  const p2=`<div class="a4" style="line-height:1.95">
+    <div class="doc-note">※　要請先の金融機関と情報提供先の所轄捜査機関（該当する□にレ印でチェック）にＦＡＸ送信してください。</div>
+    <div class="ttwrap"><span style="font-size:15pt;font-weight:700">振り込め詐欺等不正請求口座情報提供及び要請書</span></div>
+    <div class="doc-date">令和 ${d.sendY} 年 ${d.sendM} 月 ${d.sendD} 日</div>
+    <div><span class="chk">${isYucho?'⦿':''}</span>ゆうちょ <span class="chk">${isYucho?'':'□'}</span>銀行・信用金庫・信用組合　<span class="u">${esc(d.acBranch)}</span>店　御中　ＦＡＸ　<span class="u">${esc(d.destFax)}</span></div>
+    <div style="margin-top:6px"><span class="chk">${chk(d.police)}</span>警視庁　<span class="chk">□</span>　　　　警察本部　（刑事部捜査第二課／生活安全部生活経済事犯担当課）御中</div>
+    <div style="margin-top:14px">〔情報提供者・下記被害者代理人〕</div>
+    <div style="margin-top:6px">弁護士　<span class="u" style="min-width:8em">${FIRM.lawyer}</span><span class="stamp">徳永<br>之印</span>　${FIRM.bar}・登録番号　<span class="u">${FIRM.reg}</span></div>
+    <div style="margin-top:6px">事務所名・所在地　<span class="u" style="min-width:24em">${FIRM.name}・${FIRM.addr}</span></div>
+    <div style="margin-top:6px">ＴＥＬ　<span class="u">${FIRM.tel}</span>　ＦＡＸ　<span class="u">${FIRM.fax}</span></div>
+    <div style="margin-top:12px">〔被害者〕　住　所　<span class="u" style="min-width:22em">${esc(d.vAddr)}</span></div>
+    <div style="margin-top:6px">　　　　　　氏　名　<span class="u" style="min-width:16em">${esc(d.vName)}${d.vKana?`（${esc(d.vKana)}）`:''}</span></div>
+    <div class="lead">下記預金口座について，犯罪利用があるものと思慮しますので，口座情報を提供し，もって，<b>預金取引の停止又は預金口座の解約</b>をお願いします。なお，口座名義人から本件クレーム等があった場合は，当職からの要請であることを相手方に告知し，その旨を当職までご連絡ください。その場合クレーム等に対しては当職の責任において一切の処理を行います。</div>
+    <div class="num">１．対象口座の表示</div>
+    <div style="margin-left:1em">ゆうちょ <span class="chk">${isYucho?'⦿':''}</span>銀行・信用金庫・信用組合　<span class="u">${esc(d.acBranch)}</span>店　<span class="chk">${d.acType==='普通'?'⦿':''}</span>普通・<span class="chk">${d.acType==='当座'?'⦿':''}</span>当座・その他</div>
+    <div style="margin-left:1em;margin-top:6px">口座番号　<span class="u">${esc(d.acNo)}</span>　　口座名義人　<span class="u">${esc(d.acName)}</span></div>
+    <div class="num">２．振り込め詐欺等不正請求の手口</div>
+    <div style="margin-left:1em">${TEGUCHI.map(t=>`<span class="chk">${d.teguchi===t?'☑':'□'}</span>${t}`).join('　')}</div>
+    <div style="margin-left:1em;margin-top:4px">その他の場合の手口の内容</div>
+    <div class="box" style="margin-left:1em">${esc(d.teguchiOther)}</div>
+    <div class="num">３．その他参考事項</div>
+    <div class="num">４．参考書類　<span class="chk">☑</span>有　<span class="chk">□</span>無</div>
+    <div style="margin-left:1em">${['振込み控え','ダイレクトメール','チラシ','その他'].map(r=>`<span class="chk">${d.refDoc===r?'☑':'□'}</span>${r}`).join('　')}</div>
+  </div>`;
+  // Page3: 被害詳細
+  const p3=`<div class="a4">
+    <div class="ttwrap"><span style="font-size:16pt;font-weight:700">被害詳細</span></div>
+    <div class="dmg-grid">
+      <div class="dmg-img">${d.imgData?`<img src="${d.imgData}">`:'<div class="box center" style="height:300px;display:flex;align-items:center;justify-content:center;color:#999">振込明細の画像<br>（左のフォームでアップロード）</div>'}</div>
+      <div class="dmg-box">
+        振込日：${esc(d.txDate)}<br><br>
+        振込金額：${esc(d.txAmount)}<br><br>
+        【口座情報】<br>
+        　${esc(d.acBankType)}<br>
+        　${esc(d.acBranch)}<br>
+        　${esc(d.acType)}　${esc(d.acNo)}<br>
+        　${esc(d.acName)}
+      </div>
+    </div>
+  </div>`;
+  document.getElementById('docprev').innerHTML=p1+p2+p3;
+}
+function closeDoc(){document.getElementById('docmodal').classList.remove('on');}
+async function markDocSent(){
+  const cid=DOC._cid;
+  try{
+    await fetch(`${CFG.url}/rest/v1/customers?id=eq.${cid}`,{method:'PATCH',
+      headers:{apikey:CFG.key,Authorization:'Bearer '+TOKEN,'Content-Type':'application/json',Prefer:'return=minimal'},
+      body:JSON.stringify({doc_status:'書類送付済み',doc_sent_at:new Date().toISOString()})});
+    await fetch(`${CFG.url}/rest/v1/documents`,{method:'POST',
+      headers:{apikey:CFG.key,Authorization:'Bearer '+TOKEN,'Content-Type':'application/json',Prefer:'return=minimal'},
+      body:JSON.stringify({customer_id:cid,kind:'freeze_request',payload:{...DOC,imgData:DOC.imgData?'(image)':null}})});
+    closeDoc();
+    alert('「書類送付済み」に更新しました。');
+    openDetail(cid);
+  }catch(e){alert('更新エラー: '+e.message);}
 }
 
 function loadLost(){

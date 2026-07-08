@@ -329,10 +329,21 @@ $('lform').addEventListener('submit',async e=>{
 });
 $('logout').onclick=()=>{localStorage.removeItem('tg_token');location.reload();};
 
+// 営業ロールに見せない画面（広告費・粗利・成果報酬・目標・設定）
+const HIDDEN_FOR_SALES=['mkt','yojitsu','goals','settings'];
+const isSales=()=>!!(ME&&ME.user_metadata&&ME.user_metadata.role==='sales');
 function startApp(){
   $('login').style.display='none'; $('app').classList.add('on');
   const nm=(ME&&ME.user_metadata&&ME.user_metadata.name)||'me';
   $('me-av').textContent=nm[0].toUpperCase();
+  if(isSales()){
+    HIDDEN_FOR_SALES.forEach(v=>{const el=document.querySelector(`#nav a[data-v="${v}"]`);if(el)el.remove();});
+    document.querySelectorAll('#nav .nlabel').forEach(l=>{ // 空になったセクション見出しを除去
+      let n=l.nextElementSibling, has=false;
+      while(n&&!n.classList.contains('nlabel')){if(n.tagName==='A')has=true;n=n.nextElementSibling;}
+      if(!has)l.remove();
+    });
+  }
   loadHome(); loadListMeta(); loadFooter();
 }
 async function loadFooter(){
@@ -375,31 +386,41 @@ async function loadHome(){
   }catch(e){$('home-body').innerHTML=`<div class="empty">読み込みエラー: ${esc(e.message)}</div>`;}
 }
 
-let listFilter='all', listPage=0, listQ='';
+let listFilter='all', listJudge='all', listPage=0, listQ='';
 const PAGE=40;
+const JUDGE_C={'有効':C.good,'送客':C.purple,'見込み外':C.grey,'未判定':C.warn};
+const judgeBadge=j=>j?`<span class="b-mark" style="background:${(JUDGE_C[j]||C.grey)}1c;color:${JUDGE_C[j]||C.grey}"><span class="chip" style="background:${JUDGE_C[j]||C.grey}"></span>${esc(j)}</span>`:'—';
 function loadListMeta(){
   const groups=[['all','すべて'],['active','アクティブ・追客'],['closing','クロージング・入金'],['soukyaku','送客'],['invalid','無効リード'],['lost','失注']];
-  $('listfilters').innerHTML=groups.map((g,i)=>`<button class="fchip ${i===0?'on':''}" data-f="${g[0]}">${g[1]}</button>`).join('');
-  document.querySelectorAll('#listfilters .fchip').forEach(b=>b.onclick=()=>{
-    document.querySelectorAll('#listfilters .fchip').forEach(x=>x.classList.remove('on'));b.classList.add('on');
+  const judges=[['all','判定:全て'],['有効','有効'],['送客','送客'],['見込み外','見込み外'],['未判定','未判定']];
+  $('listfilters').innerHTML=groups.map((g,i)=>`<button class="fchip ${i===0?'on':''}" data-f="${g[0]}">${g[1]}</button>`).join('')
+    +'<span style="width:1px;background:var(--line);margin:2px 6px;align-self:stretch"></span>'
+    +judges.map((g,i)=>`<button class="fchip jchip ${i===0?'on':''}" data-j="${g[0]}">${g[1]}</button>`).join('');
+  document.querySelectorAll('#listfilters .fchip[data-f]').forEach(b=>b.onclick=()=>{
+    document.querySelectorAll('#listfilters .fchip[data-f]').forEach(x=>x.classList.remove('on'));b.classList.add('on');
     listFilter=b.dataset.f;listPage=0;loadList();});
+  document.querySelectorAll('#listfilters .jchip').forEach(b=>b.onclick=()=>{
+    document.querySelectorAll('#listfilters .jchip').forEach(x=>x.classList.remove('on'));b.classList.add('on');
+    listJudge=b.dataset.j;listPage=0;loadList();});
   let qt;$('q').addEventListener('input',e=>{clearTimeout(qt);qt=setTimeout(()=>{listQ=e.target.value.trim();listPage=0;loadList();},300);});
 }
 async function loadList(){
   $('ltable').innerHTML='<tbody><tr><td><div class="spin"></div></td></tr></tbody>';
-  let base='customers?select=id,name,taiou_mark,mark_group,memo,added_at&order=added_at.desc';
+  let base='customers?select=id,name,taiou_mark,mark_group,judged,damage_amount,pay_method,owner,added_at&order=added_at.desc';
   if(listFilter!=='all')base+='&mark_group=eq.'+listFilter;
+  if(listJudge!=='all')base+='&judged=eq.'+encodeURIComponent(listJudge);
   if(listQ)base+='&name=ilike.*'+encodeURIComponent(listQ)+'*';
   const cnt=await count(base);
   const rows=await api(base+`&limit=${PAGE}&offset=${listPage*PAGE}`);
-  let html='<thead><tr><th>顧客</th><th>対応マーク（フェーズ）</th><th>メモ抜粋</th><th>流入日</th></tr></thead><tbody>';
-  if(!rows.length)html+='<tr><td colspan="4"><div class="empty">該当なし</div></td></tr>';
+  let html='<thead><tr><th>顧客</th><th>対応マーク（フェーズ）</th><th>判定</th><th>被害額</th><th>送金方法</th><th>担当</th><th>流入日</th></tr></thead><tbody>';
+  if(!rows.length)html+='<tr><td colspan="7"><div class="empty">該当なし</div></td></tr>';
   rows.forEach(r=>{
-    const memo=(r.memo||'').replace(/\s+/g,' ').slice(0,44);
     const d=r.added_at?new Date(r.added_at).toLocaleDateString('ja-JP',{month:'numeric',day:'numeric'}):'';
     html+=`<tr class="click" data-id="${r.id}"><td class="nm" style="color:var(--link)">${esc(r.name||'（名前未登録）')}</td>
       <td><span class="b-mark"><span class="chip" style="background:${markColor(r.taiou_mark)}"></span>${esc(r.taiou_mark||'—')}</span></td>
-      <td class="sub2">${esc(memo)}</td><td class="sub2">${d}</td></tr>`;
+      <td>${judgeBadge(r.judged)}</td>
+      <td class="sub2">${esc(r.damage_amount||'—')}</td><td class="sub2">${esc(r.pay_method||'—')}</td>
+      <td class="sub2">${esc(r.owner||'—')}</td><td class="sub2">${d}</td></tr>`;
   });
   html+='</tbody>';$('ltable').innerHTML=html;
   document.querySelectorAll('#ltable tr.click').forEach(tr=>tr.onclick=()=>openDetail(tr.dataset.id));
@@ -418,10 +439,25 @@ async function openDetail(id){
     const msgs=await api(`messages?customer_id=eq.${id}&select=direction,mtype,body,sent_at,line_message_id&order=sent_at.asc&limit=300`);
     const media=await api(`media?customer_id=eq.${id}&select=filename,drive_url,status,bytes,line_message_id&order=created_at.desc`);
     const hist=await api(`mark_history?customer_id=eq.${id}&select=from_mark,to_mark,changed_at&order=changed_at.desc&limit=30`);
-    renderDetail(c,msgs,media,hist);
+    const docs=await api(`documents?customer_id=eq.${id}&select=id,kind,created_at,created_by,filename:payload->>filename&order=created_at.desc&limit=50`);
+    renderDetail(c,msgs,media,hist,docs);
   }catch(e){$('detail-body').innerHTML=`<div class="empty">読み込みエラー: ${esc(e.message)}</div>`;}
 }
-function renderDetail(c,msgs,media,hist){
+const SEL_NAMES={'2004672':'迫田','2004671':'下沢'}; // Lステップ選択肢ID→表示名（担当者）
+function renderInfos(c){
+  const fis=(c.raw&&c.raw.friend_infos)||[];
+  if(!fis.length)return '<div class="empty">友だち情報なし（未回答）</div>';
+  const order=['リード判別','初回_送金額','初回_被害時期','初回_送金方法','被害総額','送金方法','被害にあったサイト名','被害内容','被害の詳細','名前','電話番号','年齢','都道府県','フォーム回答日','担当者','検索したKW','初回電話予定日','初回通電日','初回見積もり提出日','契約書締結日','支払い方法','初回入金日','初回入金額','失注理由','失注日'];
+  const rank=n=>{const i=order.findIndex(o=>n.includes(o));return i<0?99:i;};
+  const rows=fis.slice().sort((a,b)=>rank(a.name)-rank(b.name)).map(fi=>{
+    let v=String(fi.value??'');
+    if(SEL_NAMES[v])v=SEL_NAMES[v];
+    return `<div class="mrow"><span class="sub2" style="width:150px;flex:none">${esc(fi.name)}</span><span style="word-break:break-all"><b>${esc(v)}</b></span></div>`;
+  }).join('');
+  return rows;
+}
+function renderDetail(c,msgs,media,hist,docs){
+  docs=docs||[];
   const nm=c.name||'（名前未登録）';
   const imgByLmid={}; media.forEach(m=>imgByLmid[m.line_message_id]=m);
   let talk='';
@@ -445,7 +481,7 @@ function renderDetail(c,msgs,media,hist){
   const expired=media.filter(m=>m.status==='expired').length;
   const cell=m=>{const inner=`<div class="dp">🖼</div><b>${esc(m.filename||'画像')}</b><span>${m.drive_url?'Drive・開く':'Drive保存済'}</span>`;
     return m.drive_url?`<a class="doccell" href="${esc(m.drive_url)}" target="_blank" rel="noopener">${inner}</a>`:`<div class="doccell" style="cursor:default">${inner}</div>`;};
-  const docs=saved.length?saved.map(cell).join('')
+  const docCells=saved.length?saved.map(cell).join('')
     :`<div class="empty">保存済み画像なし${expired?`（${expired}件はLINE保存期限切れで取得不可）`:''}</div>`;
   const expNote=expired&&saved.length?`<div class="note" style="margin-top:12px">うち ${expired}件 はLINE側の保存期限切れで取得できませんでした（過去分のみ）。今後の受信画像は毎時取得で自動保存されます。</div>`:'';
   const histRows=hist.length?hist.map(h=>`<div class="mrow"><span class="sub2" style="width:96px">${new Date(h.changed_at).toLocaleString('ja-JP',{month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'})}</span><span>${esc(h.from_mark||'—')} → <b>${esc(h.to_mark||'—')}</b></span></div>`).join(''):'<div class="empty">変更履歴なし（次回同期以降のマーク変更が記録されます）</div>';
@@ -454,20 +490,28 @@ function renderDetail(c,msgs,media,hist){
       <div style="flex:1;min-width:200px"><h2>${esc(nm)}</h2>
         <div class="sub2" style="margin-top:3px">UID ${esc((c.uid||'').slice(0,14))}… ・ 流入 ${c.added_at?new Date(c.added_at).toLocaleDateString('ja-JP'):'—'}${c.doc_status?` ・ <b style="color:var(--good)">📄 ${esc(c.doc_status)}</b>`:''}</div></div>
       <button class="btn" id="docbtn" style="background:var(--orange);color:#fff;font-weight:700;border-radius:5px;padding:9px 16px">📄 資料作成</button>
+      ${judgeBadge(c.judged)}
       <span class="b-mark" style="background:${markColor(c.taiou_mark)}1c;color:${markColor(c.taiou_mark)}"><span class="chip" style="background:${markColor(c.taiou_mark)}"></span>${esc(c.taiou_mark||'—')}</span>
     </div>
     <div class="d-grid">
-      <div class="panel"><div class="phead"><div class="sectitle">個別メモ（Lステップ）</div></div><div class="pbody">
+      <div>
+      <div class="panel"><div class="phead"><div class="sectitle">友だち情報（Lステップ）</div>${c.owner?`<span class="badge" style="background:var(--navy-soft);color:var(--navy)">担当: ${esc(c.owner)}</span>`:''}</div><div class="pbody">
+        ${renderInfos(c)}
+      </div></div>
+      <div class="panel" style="margin-top:14px"><div class="phead"><div class="sectitle">個別メモ（Lステップ）</div></div><div class="pbody">
         ${c.memo?`<div class="memo">${esc(c.memo)}</div>`:'<div class="empty">メモなし</div>'}
       </div></div>
+      </div>
       <div class="panel">
         <div class="rtabs" id="rtabs">
           <button class="on" data-t="talk">トーク履歴 <span class="sub2">${msgs.length}</span></button>
           <button data-t="docs">受信画像 <span class="sub2">${media.length}</span></button>
+          <button data-t="files">書類 <span class="sub2">${docs.length}</span></button>
           <button data-t="log">変更履歴</button>
         </div>
         <div class="rpane on" id="rp-talk"><div class="talk">${talk||'<div class="empty">トークなし</div>'}</div></div>
-        <div class="rpane" id="rp-docs"><div class="docgrid">${docs}</div>${expNote}</div>
+        <div class="rpane" id="rp-docs"><div class="docgrid">${docCells}</div>${expNote}</div>
+        <div class="rpane" id="rp-files">${docs.length?docs.map(d=>`<div class="mrow"><span class="sub2" style="width:96px">${new Date(d.created_at).toLocaleString('ja-JP',{month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'})}</span>${d.kind==='freeze_request_pdf'?`<a href="#" onclick="downloadDocPdf(${d.id});return false" style="color:var(--link)">📄 ${esc(d.filename||'口座凍結要請書.pdf')}</a>`:`<span>📋 送付記録（${esc(d.kind)}）</span>`}${d.created_by?`<span class="sub2" style="margin-left:8px">${esc(d.created_by)}</span>`:''}</div>`).join(''):'<div class="empty">生成した書類はここに表示されます（資料作成→クラウド保存）</div>'}</div>
         <div class="rpane" id="rp-log">${histRows}</div>
       </div>
     </div>`;
@@ -488,21 +532,30 @@ function parseMemo(memo){ // メモから住所/電話/被害額/口座情報を
   const amt=m.match(/被害金額[：:]\s*([\d,]+)\s*万?円/); if(amt)g.dmg=amt[1];
   return g;
 }
+function infoVal(c,idOrName){
+  const fis=(c.raw&&c.raw.friend_infos)||[];
+  const fi=fis.find(x=>(x.friend_info_id||x.id)===idOrName||x.name===idOrName||(typeof idOrName==='string'&&x.name&&x.name.includes(idOrName)));
+  return fi?String(fi.value??''):'';
+}
 function openDocBuilder(c){
   const g=parseMemo(c.memo);
   const today=new Date();
+  // 友だち情報から自動流し込み（本名 > フォーム名前 > LINE名 / 被害総額 / 都道府県）
+  const fullName=c.full_name||infoVal(c,'名前')||c.name||'';
+  const rawAmt=infoVal(c,'被害総額')||c.damage_amount||'';
+  const amt=/^\d+$/.test(rawAmt)?(+rawAmt).toLocaleString('ja-JP')+'円':rawAmt;
   DOC={
     // 送信先
     bankName:'ゆうちょ銀行', bankDept:'', destFax:'', police:false,
     sendY:today.getFullYear()-2018, sendM:today.getMonth()+1, sendD:today.getDate(),
     // 被害者
-    vName:c.name||'', vKana:'', vAddr:'',
+    vName:fullName, vKana:'', vAddr:c.pref||'',
     // 対象口座（詐欺口座）
     acBankType:'ゆうちょ銀行', acBranch:'', acType:'普通', acNo:'', acName:'',
     // 手口
-    teguchi:'その他', teguchiOther:'投資詐欺',
+    teguchi:'その他', teguchiOther:infoVal(c,'被害内容')||'投資詐欺',
     // 被害明細
-    txDate:'', txAmount:'', refDoc:'振込み控え',
+    txDate:'', txAmount:amt||g.dmg||'', refDoc:'振込み控え',
     imgData:null,
     _cid:c.id,
   };
@@ -564,10 +617,42 @@ function renderDocForm(){
     </div>
     <div class="docbar">
       <button class="close" onclick="closeDoc()">閉じる</button>
-      <button class="print" onclick="window.print()">🖨 プレビュー印刷 / PDF化</button>
+      <button class="print" onclick="window.print()">🖨 印刷 / PDF化</button>
+      <button class="print" id="docsave" onclick="saveDocPdf()">☁ クラウド保存</button>
       <button class="sent" onclick="markDocSent()">✓ 送付済みにする</button>
     </div>`;
   bindDoc();
+}
+async function saveDocPdf(){
+  const btn=$('docsave'); btn.textContent='生成中…'; btn.disabled=true;
+  try{
+    if(!window.html2pdf){
+      await new Promise((ok,ng)=>{const s=document.createElement('script');
+        s.src='https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js';
+        s.onload=ok;s.onerror=()=>ng(new Error('PDFライブラリ読込失敗'));document.head.appendChild(s);});
+    }
+    const blob=await html2pdf().set({margin:0,image:{type:'jpeg',quality:.92},
+      html2canvas:{scale:2,useCORS:true},jsPDF:{unit:'mm',format:'a4'},pagebreak:{mode:'css'}})
+      .from($('docprev')).outputPdf('blob');
+    const b64=await new Promise(r=>{const fr=new FileReader();fr.onload=()=>r(fr.result.split(',')[1]);fr.readAsDataURL(blob);});
+    const fn=`口座凍結要請書_${(DOC.vName||'無名').replace(/\s/g,'')}_${new Date().toISOString().slice(0,10)}.pdf`;
+    const r=await fetch(`${CFG.url}/rest/v1/documents`,{method:'POST',
+      headers:{apikey:CFG.key,Authorization:'Bearer '+TOKEN,'Content-Type':'application/json',Prefer:'return=minimal'},
+      body:JSON.stringify({customer_id:DOC._cid,kind:'freeze_request_pdf',
+        payload:{filename:fn,form:{...DOC,imgData:DOC.imgData?'(image)':null},pdf_b64:b64,bytes:blob.size},
+        created_by:(ME&&ME.email)||null})});
+    if(!r.ok)throw new Error('保存API '+r.status);
+    btn.textContent='✓ 保存済み';
+  }catch(e){alert('クラウド保存エラー: '+e.message);btn.textContent='☁ クラウド保存';btn.disabled=false;}
+}
+async function downloadDocPdf(docId){
+  const [d]=await api(`documents?id=eq.${docId}&select=payload`);
+  if(!d||!d.payload||!d.payload.pdf_b64)return alert('PDFデータがありません');
+  const bin=atob(d.payload.pdf_b64), u8=new Uint8Array(bin.length);
+  for(let i=0;i<bin.length;i++)u8[i]=bin.charCodeAt(i);
+  const url=URL.createObjectURL(new Blob([u8],{type:'application/pdf'}));
+  const a=document.createElement('a');a.href=url;a.download=d.payload.filename||'document.pdf';a.click();
+  setTimeout(()=>URL.revokeObjectURL(url),5000);
 }
 function chk(on){return on?'☑':'□';}
 function renderDocPreview(){
@@ -668,6 +753,7 @@ function loadLost(){
 
 const TITLES={home:['ダッシュボード','実データ・全体サマリー'],list:['顧客リスト','対応マーク＝フェーズで管理'],detail:['顧客詳細','個別メモ・トーク・受信画像・変更履歴'],lost:['失注・無効分析','掘り起こせるリードを見つける'],sales:['営業分析','月次ファネル・転換率（実データ）'],mkt:['マーケ分析','KW別ROAS・クロス分析（指標選択）'],yojitsu:['予実管理','目標 vs 実績・達成率'],goals:['目標設定','月間目標の編集'],settings:['設定','連携・ステータス']};
 function go(v){
+  if(isSales()&&HIDDEN_FOR_SALES.includes(v))v='home';
   document.querySelectorAll('.view').forEach(x=>x.classList.remove('on'));
   $('v-'+v).classList.add('on');
   document.querySelectorAll('#nav a').forEach(a=>a.classList.toggle('on',a.dataset.v===v));
@@ -855,13 +941,14 @@ function loadSettings(){
   $('settings-body').innerHTML=`<div class="eyebrow" style="font-size:10px;font-weight:700;letter-spacing:.12em;color:var(--muted2);margin-bottom:8px">CONNECTIONS</div>
   <div class="setgrid">
     ${card('💬','var(--good-soft)',C.good,'Lステップ API','接続済み',C.good,'顧客・対応マーク・トーク履歴の同期元。毎時同期（GitHub Actions）。')}
-    ${card('📣','var(--good-soft)',C.good,'広告KWデータ','一部接続',C.warn,'KW別ROAS自動化シートから広告費・成約データを取込。<br>現在：上位KW実データ48件を投入済み。<code>全件自動同期はSheets API有効化後</code>')}
+    ${card('📣','var(--good-soft)',C.good,'広告KWデータ','接続済み',C.good,'KW別ROAS自動化シート→ad_kw全件（142行）を毎時25分に自動同期（GitHub Actions・CSVフォールバック付き）。')}
+    ${card('🪪','var(--good-soft)',C.good,'友だち情報欄','接続済み',C.good,'被害額・送金方法・utm・担当者など35項目を毎時同期。見込み判定を自動計算。')}
     ${card('🖼','var(--link-soft)',C.link,'受信画像プール','手動運用',C.warn,'LINEコンテンツAPI→Drive。過去82枚保存済み。自動化は共有ドライブ導入で対応予定。')}
     ${card('📄','var(--navy-soft)',C.navy,'書類テンプレート','稼働中',C.good,'口座凍結要請書（3ページFAX）を案件詳細から生成。会社情報は自動挿入。')}
     ${card('🔒','var(--good-soft)',C.good,'アクセス権限（PII保護）','有効',C.good,'ログイン必須（Supabase Auth）。未ログインでは顧客データは一切読めない。')}
     ${card('🎯','var(--orange-soft)',C.orange,'見込み判定ルール','稼働中',C.good,'有効＝被害あり×1ヶ月以内×100万↑×銀行振込。暗号資産→送客。')}
   </div>
-  <div class="note" style="margin-top:16px"><b>スケジュール（カレンダー）機能は不要</b>との方針で除外しています。営業入力用の担当者ID／被害額・送金方法・utmの実表示は、Lステップ友だち情報欄IDの接続で有効化します。</div>`;
+  <div class="note" style="margin-top:16px"><b>スケジュール（カレンダー）機能は不要</b>との方針で除外しています。営業ロール（迫田・下沢）はマーケ分析・予実・目標・設定が非表示になります。</div>`;
 }
 
 (async()=>{

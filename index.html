@@ -943,7 +943,7 @@ function loadSettings(){
     ${card('💬','var(--good-soft)',C.good,'Lステップ API','接続済み',C.good,'顧客・対応マーク・トーク履歴の同期元。毎時同期（GitHub Actions）。')}
     ${card('📣','var(--good-soft)',C.good,'広告KWデータ','接続済み',C.good,'KW別ROAS自動化シート→ad_kw全件（142行）を毎時25分に自動同期（GitHub Actions・CSVフォールバック付き）。')}
     ${card('🪪','var(--good-soft)',C.good,'友だち情報欄','接続済み',C.good,'被害額・送金方法・utm・担当者など35項目を毎時同期。見込み判定を自動計算。')}
-    ${card('🖼','var(--link-soft)',C.link,'受信画像プール','手動運用',C.warn,'LINEコンテンツAPI→Drive。過去82枚保存済み。自動化は共有ドライブ導入で対応予定。')}
+    ${card('🖼','var(--link-soft)',C.link,'受信画像プール','自動化済み',C.good,'LINEコンテンツAPI→共有ドライブ(TG-Dashboard)へ毎時自動保存。書類PDFも同ドライブに自動保管。')}
     ${card('📄','var(--navy-soft)',C.navy,'書類テンプレート','稼働中',C.good,'口座凍結要請書（3ページFAX）を案件詳細から生成。会社情報は自動挿入。')}
     ${card('🔒','var(--good-soft)',C.good,'アクセス権限（PII保護）','有効',C.good,'ログイン必須（Supabase Auth）。未ログインでは顧客データは一切読めない。')}
     ${card('🎯','var(--orange-soft)',C.orange,'見込み判定ルール','稼働中',C.good,'有効＝被害あり×1ヶ月以内×100万↑×銀行振込。暗号資産→送客。')}
